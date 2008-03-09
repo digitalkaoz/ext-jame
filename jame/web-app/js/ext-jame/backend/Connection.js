@@ -44,7 +44,9 @@ ExtJame.backend.Connection = {
 		f.ownerCt.form.submit({
 			reset:false,
 			scope: this,
-			success:ExtJame.factory.loginORClient
+			success:function(r){
+						ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
+					}
 		});
 	},
 

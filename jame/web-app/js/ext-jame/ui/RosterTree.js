@@ -348,7 +348,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description returns the group matching the parameter
 		 */
 		getGroup : function(_name){
-			return rosterGroups[_name];
+			return rosterGroups.get(_name);
 		},
 	
 		/**
@@ -357,7 +357,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description returns the buddy matching the parameter
 		 */
 		getBuddy : function(_name){
-			return rosterBuddys[_name];
+			return rosterBuddys.get(_name);
 		},
 	
 		/**
@@ -439,9 +439,10 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @public
 		 * @description updates a buddy node
 		 */
-		updateBuddy : function(_attrs){
-			var buddy = rosterBuddys[_attrs["jid"]];
-			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png";
+		updateBuddy : function(buddy,_attrs){
+			if(_attrs["subscription"] == "unavailable")
+				_attrs["status"] = "unavailable";
+			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png",
 			buddy.attributes.status = _attrs['status'];
 			buddy.attributes.subscription = _attrs['subscription'];
 			var qtip = "JID : "+_attrs["from"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];

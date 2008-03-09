@@ -164,7 +164,7 @@ ExtJame.factory = {
 			ExtJame.connected = true;
 			if(Ext.WindowMgr.get("LoginDialog"))
 				Ext.WindowMgr.get("LoginDialog").close();
-			//ExtJame.backend.Connection.getNotifications();
+			ExtJame.backend.Connection.getNotifications();
 		}else{	// no is not connected,show the login widget
 			ExtJame.connected = false;
 			if(!Ext.WindowMgr.get("LoginDialog"))
