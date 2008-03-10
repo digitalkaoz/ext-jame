@@ -33,8 +33,4 @@ var ExtJame = {
 				Ext.WindowMgr.each(function(win){win.show();})
 		}
 	}
-}
-
-window.close = function(){
-	alert("test");
-}
+}  

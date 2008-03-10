@@ -26,8 +26,8 @@ ExtJame.backend.Connection = {
 		var upd = new Ajax.PeriodicalUpdater(container, 
 			ExtJame.backend.url.getnotifications, 
 			{method: 'get',
-			frequency: 2, 
-			decay: 1,
+			frequency: 1, 
+			decay: 2,
 			onSuccess : function(transport){	//parse the response
 				ExtJame.backend.Xml.parseNotifications(transport.responseXML.firstChild);
 			},

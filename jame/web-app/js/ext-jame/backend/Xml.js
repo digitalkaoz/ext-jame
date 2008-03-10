@@ -175,6 +175,13 @@ ExtJame.backend.Xml = {
 						var buddy = ExtJame.roster.getBuddy(buddys[i]["jid"]);
 						if(buddy){
 							ExtJame.roster.updateBuddy(buddy,buddys[i]);
+							if(Ext.ComponentMgr.get(buddys[i]["jid"])){
+									var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
+									var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
+									tabSpan.removeClass(oldIconClass);
+									Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
+									tabSpan.addClass(buddys[i]["status"]);
+							}
 						}else{
 							ExtJame.roster.addBuddys(null,XmlEl);
 						}
