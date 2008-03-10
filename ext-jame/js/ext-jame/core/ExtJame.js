@@ -15,8 +15,8 @@ var ExtJame = {
 	chats : new Hash(),
 	connected : false,
 	roster: null,
-	//id:null,
 	myJid:"",
+	hud:null,
 
 	/**
 	 * @method initSession
@@ -24,6 +24,9 @@ var ExtJame = {
 	 * @description initializes the Session Object if not present
 	 */
 	init : function(){
+		//turn on quicktips
+		Ext.QuickTips.init();
+    	
 		if(!ExtJame.connected)
 			ExtJame.backend.Connection.isConnected();
 		else{
@@ -33,4 +36,13 @@ var ExtJame = {
 				Ext.WindowMgr.each(function(win){win.show();})
 		}
 	}
-}  
+}
+
+/**
+ * binds the application to the hud element (id)
+ */
+Ext.onReady(function(){
+    ExtJame.hud = Ext.get('jame-hud');
+    if(ExtJame.hud)
+    	ExtJame.hud.on('click', ExtJame.init);
+});

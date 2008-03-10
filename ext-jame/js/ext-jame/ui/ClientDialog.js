@@ -25,8 +25,6 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 		extDialog = new Ext.Window(config);
 		extDialog.setTitle(ExtJame.myJid);
 		extDialog.show(opener);
-		ExtJame.roster = new ExtJame.ui.RosterTree(extDialog.getComponent('buddy-panel'));
-		ExtJame.roster.init();
 		status = new Ext.form.FormPanel({
 			hideLabels:true,
 			method:'POST',
@@ -51,6 +49,8 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 		});
 		extDialog.getComponent(1).add(status);
 		status.findById("status-box").on("select",changeState,status);
+		ExtJame.roster = new ExtJame.ui.RosterTree(extDialog.getComponent('buddy-panel'));
+		ExtJame.roster.init();
 		extDialog.doLayout();
 	}
 	

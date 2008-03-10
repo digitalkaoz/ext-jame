@@ -20,13 +20,14 @@ ExtJame.ui.RosterTree = function(_parent){
 	 * @description creates the tree, fetches the groups and buddys from the backend, and append these to the tree
 	 */
 	var createTree = function(url) {
-		Ext.QuickTips.init();
 		extTree = new Ext.tree.TreePanel({
 				enableDD:true,
 				animate:true,
 				rootVisible:false,
 				lines:false,
-				ddGroup: "buddys"
+				ddGroup: "buddys",
+				border:false,
+				
 		});
 		extTree.setRootNode(new Ext.tree.TreeNode({
 				text: "buddys",
@@ -166,6 +167,8 @@ ExtJame.ui.RosterTree = function(_parent){
 			var jid = e.id;
 			var anchor = e.ui.anchor;
 		}
+		if(!anchor)
+			anchor = ExtJame.hud;
 		if(Ext.ComponentMgr.get(jid)){
 			Ext.WindowMgr.get(jid).show();
 			Ext.WindowMgr.get(jid).getComponent(0).activate(jid);

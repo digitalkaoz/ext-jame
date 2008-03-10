@@ -27,7 +27,7 @@ ExtJame.backend.Connection = {
 			ExtJame.backend.url.getnotifications, 
 			{method: 'get',
 			frequency: 1, 
-			decay: 2,
+			decay: 1,
 			onSuccess : function(transport){	//parse the response
 				ExtJame.backend.Xml.parseNotifications(transport.responseXML.firstChild);
 			},

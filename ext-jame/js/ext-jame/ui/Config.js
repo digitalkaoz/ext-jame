@@ -14,46 +14,45 @@ ExtJame.ui.UiConfig = {
 		title:"Login",
 		id:'LoginDialog',
 		width: 320,
-		height: 210,
-		closable:true,
-		resizable:true,
+		height: 230,
 		collapsible:true,
 		plain:true,
 		layout:'fit',
 		items:[{
 			xtype:'form',
-			labelWidth: 120,
 			labelAlign:'left',
-			hideBorders:true,
-			layout:'form',
-			plain:true,
 			method:'POST',
 			url:ExtJame.backend.url.login,
-			bodyStyle:'background:transparent;',
-			bodyBorder:false,
+			bodyStyle:'background:transparent;padding:10px;',
 			border:false,
+			defaultType: 'textfield',
 			items:[{
-				xtype:'textfield',
 				fieldLabel: 'Username',
 				name: 'name',
-				allowBlank:false
+				allowBlank:false,
+				anchor:'90%',
+				msgTarget : "side" 
 			}, {
-				xtype:'textfield',
 				inputType:'password',
 				fieldLabel: 'Password',
 				name: 'password',
-				allowBlank:false
+				allowBlank:false,
+				anchor:'90%',
+				msgTarget : "side" 
 			}, {
-				xtype:'textfield',
 				fieldLabel:'Server',
 				name:'server',
-				allowBlank:false
+				allowBlank:false,
+				anchor:'90%',
+				msgTarget : "side" 
 			}, {
 				xtype:'numberfield',
 				fieldLabel:'Port',
 				name:'port',
 				value: "5222",
-				allowBlank:false
+				allowBlank:false,
+				grow:true,
+				msgTarget : "side" 
 			}, {
 				xtype:'checkbox',
 				fieldLabel:'Register new User?',
@@ -72,19 +71,18 @@ ExtJame.ui.UiConfig = {
 		width:188,
 		height:400,
 		collapsible:true,
-		minimizable: true,
-		resizable:true,
+		closable:false,
 		plain:true,
+		border:false,
 		layout:'border',
 		tbar: new Ext.Toolbar({
-			layout:'fit',
 			items:[{
 				text:'Roster',
 				tooltip:'manage my buddys',
 				menu: {
 					id:"BuddysMenu",
 					items:[{
-			        		text: 'Send Message',
+		        		text: 'Send Message',
 						icon: 'images/jame/message-pending.png',
 						disabled:true,
 						handler:ExtJame.factory.sendMessage
@@ -102,7 +100,7 @@ ExtJame.ui.UiConfig = {
 						checked:true,
 						checkHandler:ExtJame.factory.showEmpty
 					},{
-					    	text: 'Add Buddy',
+				    	text: 'Add Buddy',
 						icon: 'images/jame/user_add.png',
 						handler:ExtJame.factory.addBuddy
 					},{
@@ -136,17 +134,23 @@ ExtJame.ui.UiConfig = {
 				xtype:'tbbutton',
 				icon: 'images/jame/information.png',
 				handler:ExtJame.factory.showAbout,
-				tooltip:'About'
+				tooltip:'About',
+				cls: 'x-btn-icon',
 			}]
 		}),
 		items:[{
 			region:'center',
 			minHeight:150,
-			id:'buddy-panel'
+			id:'buddy-panel',
+			border:false,
+			layout:'fit'
 		},{
 			region:'south',
 			id:'status-container',
-			height:25
+			height:30,
+			bodyStyle:'background:transparent;padding-top:5px;',
+			layout:'fit',
+			border:false
 		}]
 	},
 	AddGroupLayout : {
@@ -154,27 +158,22 @@ ExtJame.ui.UiConfig = {
 		title:"Add Group",
 		width: 250,
 		height: 100,
-		closable:true,
 		collapsible:true,
 		plain:true,
 		layout:'fit',
 		items:[{
 			xtype:'form',
-			labelWidth: 80,
-			labelAlign:'left',
-			hideBorders:true,
-			plain:true,
-			layout:'form',
 			method:'POST',
 			url:ExtJame.backend.url.addgroup,
-			bodyStyle:'background:transparent;',
-			bodyBorder:false,
+			bodyStyle:'background:transparent;padding:10px;',
 			border:false,
 			items:[{
 				xtype:'textfield',
 				fieldLabel: 'Name',
 				name: 'name',
-				allowBlank:false
+				allowBlank:false,
+				msgTarget:'side',
+				anchor:"90%",
 			}],
 			buttons :[{
 				text:"Add Group",
@@ -186,45 +185,45 @@ ExtJame.ui.UiConfig = {
 		id:'AboutDialog',
 		title:"About",
 		width: 300,
-		height: 400,
-		closable:true,
-		resizable:false,
+		height: 180,
 		collapsible:true,
+		bodyStyle:'background:transparent;padding:10px;',
 		layout:'fit',
 		items:[{
 			xtype:'panel',
-			html:'he here comes some text',
+			html:'<center><h2>ext-jame</h2><p>a javascript jabber messenger</p><p>&copy; 2008 by Robert Schoenthal</p><p>caziel@digitalkaoz.net</p><p>licence: GPL</p></center>',
 			bodyStyle:'background:transparent;',
 			bodyBorder:false,
 			border:false,
+		}],
+		buttons:[{
+			text:"Close",
+			handler:function(){Ext.WindowMgr.get("AboutDialog").close();}
 		}]
 	},
 	AddBuddyLayout : {
 		title:"Add Buddy",
 		id:"AddBuddyDialog",
 		width: 350,
-		closable:true,
+		height:150,
 		collapsible:true,
 		layout:'fit',
 		plain:true,
 		items:[{
 			xtype:'form',
-			height:100,
-	        	labelWidth: 75,
-	        	method:'POST',
+	        method:'POST',
 			url:ExtJame.backend.url.addbuddy,
-			layout:'form',
-			bodyStyle:'background:transparent;',
-			bodyBorder:false,
+			bodyStyle:'background:transparent;padding:10px;',
 			border:false,
 			items:[{
 				xtype:'textfield',
-			        fieldLabel: 'JID',
-			        name: 'name',
-			        allowBlank:false
+		        fieldLabel: 'JID',
+		        name: 'name',
+		        allowBlank:false,
+		        msgTarget:'side',
+		        anchor:'90%'
 			},{
 				xtype:'combo',
-			        //triggerAction: 'all',
 				fieldLabel: "Group",
 				store:ExtJame.factory.groupsStore, 
 				name: 'group',
@@ -233,6 +232,8 @@ ExtJame.ui.UiConfig = {
 				typeAhead: false,
 				allowBlank:false,
 				mode: 'local',
+		        msgTarget:'side',
+		        anchor:'90%'
 			}],
 			buttons :[{
 				text:"Add Buddy",

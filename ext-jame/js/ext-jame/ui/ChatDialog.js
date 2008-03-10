@@ -42,6 +42,7 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 		});
 		extDialog.getComponent(0).on("tabchange", tabChange,extDialog.getComponent(0));		
 		extDialog.setTitle(jid);
+		extDialog.on("destroy", removeChats);
 		addPanel(extDialog.getComponent(0),id,jid);
 		extDialog.show(opener);
 		tabpanel = extDialog.getComponent(0);
@@ -62,6 +63,15 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 		if(extDialog.getComponent(0).items.getCount() == 0){
 			extDialog.close();
 		}
+	}
+	
+	/**
+	 * @method removeChats
+	 * @private
+	 * @description removes all chats, if window is closed
+	 */
+	var removeChats = function(){
+		extDialog.getComponent(0).items.each(function(item,index,length){Ext.ComponentMgr.unregister(item);return true;})
 	}
 	
 	/**
@@ -119,25 +129,26 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 					parent:id,
 					closable:true,
 					border:false,
-					bodyBorder:false,
 					layout:'border',
-					iconCls : ExtJame.roster.getBuddy(jid).attributes.status,
+					iconCls : ExtJame.roster ? ExtJame.roster.getBuddy(jid).attributes.status: '',
 					items:[{
 						region:'center',
 						border:0,
 						height:150,
 						xtype:'panel',
-						autoScroll : true
+						autoScroll : true,
+						border:false,
+						layout:'fit'
 					},{
 						region:'south',
 						minHeight:150,
 						split:true,
 						xtype:'form',
+						border:false,
 						hideLabels:true,
-						hideBorders:true,
+						bodyStyle:'background:transparent;',
 						height:150,
 						method:'POST',
-				        layout:'form',
 						url:ExtJame.backend.url.sendmessage,
 						items:[{
 				                xtype:'htmleditor',
@@ -145,7 +156,8 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 				                name: 'body',
 								allowBlank:false,
 								enableSourceEdit:false,
-								anchor:'0-50'
+								anchor:'0-50',
+								border:false
 				            },{
 				                xtype:'hidden',
 				                fieldLabel: '',

@@ -58,7 +58,7 @@ ExtJame.factory = {
 	 */
 	showAbout : function(e){
 		if(!Ext.WindowMgr.get("AboutDialog"))
-			new ExtJame.ui.SimpleDialog("jame-hud",ExtJame.ui.UiConfig.AboutLayout).init();
+			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AboutLayout).init();
 		else
 			Ext.WindowMgr.get("AboutDialog").show();
 	},
@@ -116,7 +116,7 @@ ExtJame.factory = {
 	 */
 	addBuddy : function(e){
 		if(!Ext.WindowMgr.get("AddBuddyDialog"))
-			new ExtJame.ui.SimpleDialog("jame-hud",ExtJame.ui.UiConfig.AddBuddyLayout).init();
+			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AddBuddyLayout).init();
 		else
 			Ext.WindowMgr.get("AddBuddyDialog").show();
 	},
@@ -128,7 +128,7 @@ ExtJame.factory = {
 	 */
 	addGroup : function(e){
 		if(!Ext.WindowMgr.get("AddGroupDialog"))
-			new ExtJame.ui.SimpleDialog("jame-hud",ExtJame.ui.UiConfig.AddGroupLayout).init();
+			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AddGroupLayout).init();
 		else
 			Ext.WindowMgr.get("AddGroupDialog").show();
 	},
@@ -158,7 +158,7 @@ ExtJame.factory = {
 		if(e != null && e.getAttribute("type") == "success" && ExtJame.backend.Xml.getUserFromResponse(e)){	//yes is still connected
 			ExtJame.connected = true;
 			if(!Ext.WindowMgr.get("ClientDialog"))
-				new ExtJame.ui.ClientDialog("jame-hud",ExtJame.ui.UiConfig.ClientLayout).init();
+				new ExtJame.ui.ClientDialog(ExtJame.hud,ExtJame.ui.UiConfig.ClientLayout).init();
 			else
 				Ext.WindowMgr.get("ClientDialog").show();
 			ExtJame.connected = true;
@@ -168,7 +168,7 @@ ExtJame.factory = {
 		}else{	// no is not connected,show the login widget
 			ExtJame.connected = false;
 			if(!Ext.WindowMgr.get("LoginDialog"))
-				new ExtJame.ui.SimpleDialog("jame-hud",ExtJame.ui.UiConfig.LoginLayout).init();
+				new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.LoginLayout).init();
 			else
 				Ext.WindowMgr.get("LoginDialog").show();
 		}
