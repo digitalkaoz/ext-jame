@@ -140,7 +140,7 @@ class AdapterController {
 				fnResult = "error"
 				errors = e.getMessage()
 			}
-		    //session.clear()
+		    session.clear()
 		}else{
 			session.adapter = new Adapter()
 			fnResult = "error"

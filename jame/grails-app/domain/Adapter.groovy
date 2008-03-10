@@ -99,8 +99,8 @@ class Adapter {
 								if(entry.value != null){
 									buddys{
 										entry.value.each{ presenceItem ->
-											buddy(jid:presenceItem.getJid()){
-											    status(type:presenceItem.getType(),subscription:presenceItem.getType(),presenceItem.getText())
+												buddy(jid:presenceItem.getJid()){
+												    status(type:presenceItem.getStatus(),subscription:presenceItem.getType(),presenceItem.getText())
 											}
 										}
 									}
