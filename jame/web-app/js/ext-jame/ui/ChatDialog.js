@@ -78,7 +78,6 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 	 *
 	 */
 	var pullResponse = function(){
-		window.test = this;
  		var myText = "["+ExtJame.myJid+"] "+this.ownerCt.form.items.items[0].getValue()+"<br/>";
 		this.ownerCt.ownerCt.getComponent(0).body.insertHtml("beforeEnd",myText);
 		this.ownerCt.form.items.items[0].reset();
@@ -122,11 +121,13 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 					border:false,
 					bodyBorder:false,
 					layout:'border',
+					iconCls : ExtJame.roster.getBuddy(jid).attributes.status,
 					items:[{
 						region:'center',
 						border:0,
 						height:150,
-						xtype:'panel'
+						xtype:'panel',
+						autoScroll : true,
 					},{
 						region:'south',
 						minHeight:150,
@@ -141,7 +142,7 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 						items:[{
 				                xtype:'htmleditor',
 				                fieldLabel: '',
-				                name: 'message',
+				                name: 'body',
 								allowBlank:false,
 								enableSourceEdit:false,
 								anchor:'0-50'
