@@ -18,11 +18,9 @@ import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.RosterPacket;
 
 /**
  * @class net.SmackAdapter.JameConnection
@@ -328,29 +326,7 @@ public class JameConnection implements PacketListener, RosterListener {
 			Message m = (Message) packet;
 			this.messageList.add(new JameMessage(m.getBody(), m.getSubject(), m
 			        .getFrom(), m.getTo()));
-		} else if (packet.getClass() == RosterPacket.class) { // incoming
-			// rosterpacket
-			// RosterPacket p = (RosterPacket) packet;
-		} else if (packet.getClass() == Presence.class) { // incoming
-			// subscribe, so add
-			// it to the
-			// presenceList
-			Presence p = (Presence) packet;
-			String jid = p.getFrom();
-			if (jid.indexOf("/") > 0) // ignore ressources for this version
-				jid = jid.substring(0, jid.indexOf("/"));
-			if (p.getType() == Presence.Type.subscribe) {
-				JamePresence jp = new JamePresence();
-				jp.setJid(jid);
-				jp.setStatus(p.getStatus());
-				jp.setText(p.toString());
-				jp.setType(p.getType().toString());
-				this.presenceList.add(jp);
-			}
-		} else if (packet.getClass() == IQ.class) { // iq packet
-		} else
-			// something different
-			System.out.println(packet.getClass().toString());
+		}
 	}
 
 	/**
@@ -358,12 +334,18 @@ public class JameConnection implements PacketListener, RosterListener {
 	 */
 	@SuppressWarnings("unchecked")
 	public void presenceChanged(Presence p) {
+		// System.out.println(p.toString());
 		String jid = p.getFrom();
 		if (jid.indexOf("/") > 0) // ignore ressources for this version
 			jid = jid.substring(0, jid.indexOf("/"));
 		JamePresence jp = new JamePresence();
 		jp.setJid(jid);
-		jp.setStatus(p.getStatus());
+		if (this.conn.getRoster().getPresence(jid).getType() != null)
+			jp.setStatus(this.conn.getRoster().getPresence(jid).getType()
+			        .toString());
+		if (this.conn.getRoster().getPresence(jid).getMode() != null)
+			jp.setStatus(this.conn.getRoster().getPresence(jid).getMode()
+			        .toString());
 		jp.setText(p.toString());
 		jp.setType(p.getType().toString());
 		this.presenceList.add(jp);

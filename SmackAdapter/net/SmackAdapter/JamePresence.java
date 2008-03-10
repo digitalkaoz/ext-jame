@@ -11,56 +11,64 @@ package net.SmackAdapter;
  * @description stores a simple presence Object
  */
 public class JamePresence {
-	private String jid;
-	private String status;
-	private String type;
-	private String text;
-	
-	public JamePresence(){
-		this("","","","");
+	private String	jid;
+
+	private Object	status;
+
+	private String	type;
+
+	private String	text;
+
+	public JamePresence() {
+		this("", "", "", "");
 	}
-	
-	public JamePresence(String _jid, String _status, String _type, String _text){
-		this.jid = (String)_jid;
-		if(_status != null)
-			this.status =(String) _status;
-		if(_text != null)
-			this.text = (String)_text;
-		this.type = (String)_type;
+
+	public JamePresence(String _jid, String _status, String _type, String _text) {
+		this.jid = _jid;
+		this.status = _status;
+		this.text = _text;
+		this.type = _type;
 	}
-	
-	//setters
+
+	// setters
 	public void setJid(String jid) {
-    	this.jid = jid;
-    }
-	public void setStatus(String status) {
-    	this.status = status;
-    }
+		this.jid = jid;
+	}
+
+	public void setStatus(Object status) {
+		this.status = status;
+	}
+
 	public void setText(String text) {
-    	this.text = text;
-    }
+		this.text = text;
+	}
+
 	public void setType(String type) {
-    	this.type = type;
-    }
+		this.type = type;
+	}
 
-	//getters
+	// getters
 	public String getJid() {
-    	return jid;
-    }
-	public String getStatus() {
-    	return status;
-    }
-	public String getText() {
-    	return text;
-    }
-	public String getType() {
-    	return type;
-    }
+		return this.jid;
+	}
 
-	/** 
+	public Object getStatus() {
+		return this.status;
+	}
+
+	public String getText() {
+		return this.text;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	/**
 	 * @override toString() Method so the object is more readable
 	 */
-	public String toString(){
-		return this.jid+" "+this.status+" "+this.text+" "+this.type;
+	@Override
+	public String toString() {
+		return this.jid + " " + this.status + " " + this.text + " " + this.type;
 	}
 }
