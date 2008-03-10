@@ -26,8 +26,8 @@ ExtJame.backend.Connection = {
 		var upd = new Ajax.PeriodicalUpdater(container, 
 			ExtJame.backend.url.getnotifications, 
 			{method: 'get',
-			frequency: 2, 
-			decay: 1,
+			frequency: 1, 
+			decay: 2,
 			onSuccess : function(transport){	//parse the response
 				ExtJame.backend.Xml.parseNotifications(transport.responseXML.firstChild);
 			},
@@ -44,7 +44,9 @@ ExtJame.backend.Connection = {
 		f.ownerCt.form.submit({
 			reset:false,
 			scope: this,
-			success:ExtJame.factory.loginORClient
+			success:function(r){
+						ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
+					}
 		});
 	},
 
@@ -69,25 +71,6 @@ ExtJame.backend.Connection = {
 	 */
 	isConnected : function(){
 		ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
-		
-		//temporary
-			//login widget
-		/*		if(!Ext.WindowMgr.get("LoginDialog"))
-					ExtJame.ui.SimpleDialog("jame-hud",ExtJame.ui.UiConfig.LoginLayout).init();
-				else
-					Ext.WindowMgr.get("LoginDialog").show();*/
-			//client widget
-				if(!Ext.WindowMgr.get("ClientDialog"))
-					new ExtJame.ui.ClientDialog("ClientDialog","jame-hud",ExtJame.ui.UiConfig.ClientLayout).init();
-				else
-					Ext.WindowMgr.get("ClientDialog").show();
-				ExtJame.connected = true;
-			//message widget
-				/*ts = new Date().getTime();
-				uid ="mw_"+ts;
-				new ExtJame.ui.ChatDialog(uid,"jame-hud",ExtJame.ui.UiConfig.ChatLayout,"jame-hud").init();*/
-			
-		
 	},
 
 	/**
@@ -155,12 +138,8 @@ ExtJame.backend.Connection = {
 			if(btn == "yes"){
 				var url = ExtJame.backend.url.deletegroup;
 				var parseDom = function(XmlEl){
-					if(XmlEl.nodeName == "response"){
-						var response = XmlEl.getElementsByTagName("methodResponse")[0];
-						var groups = ExtJame.backend.Xml.getGroupsFromResponse(response);
-						for(var i = 0; i<groups.length;i++){
-							ExtJame.roster.removeGroup(groups[i]);
-						}
+					if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "success"){
+						ExtJame.roster.removeGroup(e.node.text);
 					}
 				}
 				ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({name:e.node.text}));
@@ -171,7 +150,8 @@ ExtJame.backend.Connection = {
 	 		msg: 'do you really want to delete '+e.node.text,
 	 		buttons: Ext.MessageBox.YESNOCANCEL,
 			fn: deleteem,
-			icon:Ext.MessageBox.QUESTION
+			icon:Ext.MessageBox.QUESTION,
+			group:e.node.text
 		});
 	},
 
@@ -185,12 +165,8 @@ ExtJame.backend.Connection = {
 			if(btn == "yes"){
 				var url = ExtJame.backend.url.deletebuddy;
 				var parseDom = function(XmlEl){
-					if(XmlEl.nodeName == "response"){
-						var response = XmlEl.getElementsByTagName("methodResponse")[0];
-						var buddys = ExtJame.backend.Xml.getBuddysFromResponse(response);
-						for(var i = 0; i<buddys.length;i++){
-							ExtJame.roster.removeBuddy(buddys[i]["jid"]);
-						}
+					if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "success"){
+						ExtJame.roster.removeBuddy(e.node.id);
 					}
 				}
 				ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({name:e.node.id}));
@@ -280,20 +256,20 @@ ExtJame.backend.Connection = {
  * @description stores the backend urls
  */
 ExtJame.backend.url = {
-	baseurl : "/Jame/",
-	isconnected : "/Jame/adapter/isconnected",
-	login : "/Jame/adapter/login",
-	getbuddys : "/Jame/adapter/getbuddys",
-	logout : "/Jame/adapter/logout",
-	sendmessage : "/Jame/adapter/sendmessage",
-	setpresence : "/Jame/adapter/sendpresence",
-	getnotifications : "/Jame/adapter/notifications",
-	addbuddy : "/Jame/adapter/addbuddy",
-	addgroup : "/Jame/adapter/addgroup",
-	deletebuddy : "/Jame/adapter/deletebuddy",
-	deletegroup : "/Jame/adapter/deletegroup"	,
-	renamebuddy :"/Jame/adapter/renamebuddy",
-	renamegroup :"/Jame/adapter/renamegroup",
-	switchusergroup : "/Jame/adapter/switchusergroup",
-	subscribe : "/Jame/adapter/subscribe"
+	baseurl : "/jame/",
+	isconnected : "/jame/adapter/isconnected",
+	login : "/jame/adapter/login",
+	getbuddys : "/jame/adapter/getbuddys",
+	logout : "/jame/adapter/logout",
+	sendmessage : "/jame/adapter/sendmessage",
+	setpresence : "/jame/adapter/sendpresence",
+	getnotifications : "/jame/adapter/notifications",
+	addbuddy : "/jame/adapter/addbuddy",
+	addgroup : "/jame/adapter/addgroup",
+	deletebuddy : "/jame/adapter/deletebuddy",
+	deletegroup : "/jame/adapter/deletegroup"	,
+	renamebuddy :"/jame/adapter/renamebuddy",
+	renamegroup :"/jame/adapter/renamegroup",
+	switchusergroup : "/jame/adapter/switchusergroup",
+	subscribe : "/jame/adapter/subscribe"
 }

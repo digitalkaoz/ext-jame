@@ -13,10 +13,10 @@ ExtJame.ui.UiConfig = {
 	LoginLayout : {
 		title:"Login",
 		id:'LoginDialog',
-		width: 300,
+		width: 320,
 		height: 210,
 		closable:true,
-		resizable:false,
+		resizable:true,
 		collapsible:true,
 		plain:true,
 		layout:'fit',
@@ -39,6 +39,7 @@ ExtJame.ui.UiConfig = {
 				allowBlank:false
 			}, {
 				xtype:'textfield',
+				inputType:'password',
 				fieldLabel: 'Password',
 				name: 'password',
 				allowBlank:false
@@ -70,21 +71,20 @@ ExtJame.ui.UiConfig = {
 		id:'ClientDialog',
 		width:188,
 		height:400,
-		pageX:0,
-		pageY:30,
-		closable:false,
 		collapsible:true,
+		minimizable: true,
 		resizable:true,
 		plain:true,
 		layout:'border',
 		tbar: new Ext.Toolbar({
+			layout:'fit',
 			items:[{
-				cls: 'x-btn-text-icon bmenu', // icon and text class
-				text:'Buddys',
+				text:'Roster',
+				tooltip:'manage my buddys',
 				menu: {
 					id:"BuddysMenu",
 					items:[{
-			        	text: 'Send Message',
+			        		text: 'Send Message',
 						icon: 'images/jame/message-pending.png',
 						disabled:true,
 						handler:ExtJame.factory.sendMessage
@@ -102,7 +102,7 @@ ExtJame.ui.UiConfig = {
 						checked:true,
 						checkHandler:ExtJame.factory.showEmpty
 					},{
-				    	text: 'Add Buddy',
+					    	text: 'Add Buddy',
 						icon: 'images/jame/user_add.png',
 						handler:ExtJame.factory.addBuddy
 					},{
@@ -115,9 +115,9 @@ ExtJame.ui.UiConfig = {
 						handler:ExtJame.backend.Connection.logout
 					}]
 				}
-			},{
-				cls: 'x-btn-text-icon bmenu', // icon and text class
-				text:'Tools',
+			},{xtype: 'tbseparator'},{
+				text:'Profile',
+				tooltip:'my personal settings',
 				menu: {
 					id: 'ToolMenu',
 					items: [{
@@ -130,12 +130,13 @@ ExtJame.ui.UiConfig = {
 						icon: 'images/jame/vcard_edit.png',
 						disabled:true,
 						handler:ExtJame.factory.showVCard
-					 },{
-					    text: 'About',
-						icon: 'images/jame/information.png',
-						handler:ExtJame.factory.showAbout
 					 }]
 				}
+			},{xtype: 'tbseparator'},{
+				xtype:'tbbutton',
+				icon: 'images/jame/information.png',
+				handler:ExtJame.factory.showAbout,
+				tooltip:'About'
 			}]
 		}),
 		items:[{
@@ -144,13 +145,9 @@ ExtJame.ui.UiConfig = {
 			id:'buddy-panel'
 		},{
 			region:'south',
+			id:'status-container',
 			height:25
-		}
-		],
-		minimizable: true,
-		plain:true,
-		x:200,
-		y:150
+		}]
 	},
 	AddGroupLayout : {
 		id:'AddGroupDialog',
@@ -235,7 +232,6 @@ ExtJame.ui.UiConfig = {
 				valueField : 'value',
 				typeAhead: false,
 				allowBlank:false,
-				forceSelection:true,
 				mode: 'local',
 			}],
 			buttons :[{

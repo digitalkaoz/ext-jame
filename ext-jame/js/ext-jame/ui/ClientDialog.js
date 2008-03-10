@@ -8,11 +8,11 @@
  * @class ExtJame.ui.ClientDialog
  * @description provides a dialog to store the ClientMenu RosterTree and StatusForm
  */
-ExtJame.ui.ClientDialog = function(_id, _opener, _config){
+ExtJame.ui.ClientDialog = function(_opener, _config){
 
 	var extDialog = null;
 	var config = _config;
-	var id = id;
+	var id = "ClientDialog";
 	var opener = _opener;
 	var status;
 
@@ -24,7 +24,9 @@ ExtJame.ui.ClientDialog = function(_id, _opener, _config){
 	var createDialog = function(){
 		extDialog = new Ext.Window(config);
 		extDialog.setTitle(ExtJame.myJid);
-		ExtJame.roster = new ExtJame.ui.RosterTree(extDialog.getComponent('buddy-panel')).init();
+		extDialog.show(opener);
+		ExtJame.roster = new ExtJame.ui.RosterTree(extDialog.getComponent('buddy-panel'));
+		ExtJame.roster.init();
 		status = new Ext.form.FormPanel({
 			hideLabels:true,
 			method:'POST',
@@ -32,13 +34,14 @@ ExtJame.ui.ClientDialog = function(_id, _opener, _config){
 			bodyStyle:'background:transparent;',
 			bodyBorder:false,
 			border:false,
+			layout:'fit',
 			items:[{
 				xtype:'combo',
 				store:ExtJame.factory.statusStore, 
 				displayField:'text',
 				valueField:'value',
 				typeAhead: true,
-				name:'presence',
+				name:'mode',
 				mode: 'local',
 				triggerAction: 'all',
 				id:'status-box',
@@ -48,7 +51,7 @@ ExtJame.ui.ClientDialog = function(_id, _opener, _config){
 		});
 		extDialog.getComponent(1).add(status);
 		status.findById("status-box").on("select",changeState,status);
-		extDialog.show(opener);
+		extDialog.doLayout();
 	}
 	
 	/**

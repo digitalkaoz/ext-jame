@@ -155,17 +155,16 @@ ExtJame.factory = {
 	  * 
 	  */
 	loginORclient :function(e){
-		if(e != null && e.getAttribute("type") == "success"){	//yes is still connected
-			if(ExtJame.backend.Xml.getUserFromResponse(e)){
-				ExtJame.backend.Connection.getNotifications();
-				if(!Ext.WindowMgr.get("ClientDialog"))
-					new ExtJame.ui.ClientDialog("jame-hud",ExtJame.ui.UiConfig.ClientLayout).init();
-				else
-					Ext.WindowMgr.get("ClientDialog").show();
-				ExtJame.connected = true;
+		if(e != null && e.getAttribute("type") == "success" && ExtJame.backend.Xml.getUserFromResponse(e)){	//yes is still connected
+			ExtJame.connected = true;
+			if(!Ext.WindowMgr.get("ClientDialog"))
+				new ExtJame.ui.ClientDialog("jame-hud",ExtJame.ui.UiConfig.ClientLayout).init();
+			else
+				Ext.WindowMgr.get("ClientDialog").show();
+			ExtJame.connected = true;
+			if(Ext.WindowMgr.get("LoginDialog"))
 				Ext.WindowMgr.get("LoginDialog").close();
-				
-			}
+			ExtJame.backend.Connection.getNotifications();
 		}else{	// no is not connected,show the login widget
 			ExtJame.connected = false;
 			if(!Ext.WindowMgr.get("LoginDialog"))

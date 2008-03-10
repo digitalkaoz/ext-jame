@@ -19,7 +19,8 @@ ExtJame.ui.RosterTree = function(_parent){
 	 * @private
 	 * @description creates the tree, fetches the groups and buddys from the backend, and append these to the tree
 	 */
-	var createTree = function(url, callback) {
+	var createTree = function(url) {
+		Ext.QuickTips.init();
 		extTree = new Ext.tree.TreePanel({
 				enableDD:true,
 				animate:true,
@@ -32,24 +33,16 @@ ExtJame.ui.RosterTree = function(_parent){
 				allowDrag:false,
 				expanded:true
 		}));
-addGroupToTree(null,null);	//add groups
-addBuddyToTree(null,null);	//add buddys
-Ext.QuickTips.init();
-		/*var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
-		p.on("loadexception", function(o, response, e) {
-			//if (e) throw e;
-		});
+		var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
 		p.load(null, {	//if load was complete
 			read: function(response) {
 				if(response && response.responseXML){
 					var doc = response.responseXML;
 					addGroupToTree(null,doc.documentElement);	//add groups
 					addBuddyToTree(null,doc.documentElement);	//add buddys
-    				Ext.QuickTips.init();
 				}
 			}
-		}, parent.add(extTree), extTree);*/
-		parent.add(extTree);
+		}, function(){parent.add(extTree)}, extTree);
 		return extTree;
 	}
 	
@@ -108,6 +101,11 @@ Ext.QuickTips.init();
 	 */
 	var buddyContext = function(_node, e){
 		var items = Array();
+		items.push({ 	text: 'message', 
+				handler: initChat ,
+				node:_node,
+				focus:this,
+				icon: 'images/jame/message-pending.png'});
 		items.push({ 	text: 'edit', 
 				handler: renameBuddy ,
 				node:_node, 
@@ -161,14 +159,20 @@ Ext.QuickTips.init();
 	 * @description is called if a buddy dbl clicked, create if chat if doesnt exists, otherwise show it
 	 */
 	var initChat = function(e) {
-		if(Ext.ComponentMgr.get(e.id)){
-			var pDlg = Ext.ComponentMgr.get(e.id).parent;
-			Ext.WindowMgr.get(pDlg).show();
-			Ext.WindowMgr.get(pDlg).getComponent(0).activate(e.id);
+		if(this.node){
+			var jid = this.node.id;
+			var anchor = this.node.ui.anchor;
+		}else{
+			var jid = e.id;
+			var anchor = e.ui.anchor;
+		}
+		if(Ext.ComponentMgr.get(jid)){
+			Ext.WindowMgr.get(jid).show();
+			Ext.WindowMgr.get(jid).getComponent(0).activate(jid);
 		}else{
 			ts = new Date().getTime();
 			uid ="mw_"+ts;
-			new ExtJame.ui.ChatDialog(uid,e.ui.anchor,ExtJame.ui.UiConfig.ChatLayout,e.id).init();
+			new ExtJame.ui.ChatDialog(uid,anchor,ExtJame.ui.UiConfig.ChatLayout,jid).init();
 		}
 	}
 	
@@ -178,39 +182,43 @@ Ext.QuickTips.init();
 	 * @description adds groups to the tree
 	 */
 	var addGroupToTree = function(f,a){
-					var _group = new Ext.tree.TreeNode({ //group adden
-								text:"bla",
-								iconCls:"hidden",
-								expanded:true,
-								allowDrag:false,
-								"gname":"bla",
-								qtip:"Group:"
-				});
-				_group.on("contextmenu",groupContext,this);
-				rosterGroups.set("bla", _group);		
-				extTree.root.appendChild(_group);
-		
-/*		var e = null;
+		var e = null;
 		if(a && a.response)
 			e = a.response.responseXML.firstChild;
 		else
 			e = a;	
 		if(e.getAttribute("type") == "success"){
-			var groups = ExtJame.backend.Xml.getGroupsFromResponse(e.getElementsByTagName("methodResponse")[0]);
-			for(var i=0;i<groups.length;i++){
+			if(f){
 				var _group = new Ext.tree.TreeNode({ //group adden
-								text:groups[i],
-								iconCls:"hidden",
+								text:f.findField("name").getValue(),
+								iconCls:"display:none;",
 								expanded:true,
+								expandable:true,
 								allowDrag:false,
-								"gname":groups[i],
-								qtip:"Group:"+groups[i]
+								"gname":f.findField("name").getValue(),
+								qtip:"Group:"+f.findField("name").getValue()
 				});
 				_group.on("contextmenu",groupContext,this);
-				rosterGroups.set(groups[i], _group);		
+				rosterGroups.set(f.findField("name").getValue(), _group);		
 				extTree.root.appendChild(_group);		
+			}else{
+				var groups = ExtJame.backend.Xml.getGroupsFromResponse(e.getElementsByTagName("methodResponse")[0]);
+				for(var i=0;i<groups.length;i++){
+					var _group = new Ext.tree.TreeNode({ //group adden
+									text:groups[i],
+									iconCls:"display:none",
+									expanded:true,
+									expandable:true,
+									allowDrag:false,
+									"gname":groups[i],
+									qtip:"Group:"+groups[i]
+					});
+					_group.on("contextmenu",groupContext,this);
+					rosterGroups.set(groups[i], _group);		
+					extTree.root.appendChild(_group);		
+				}
 			}
-		}*/
+		}
 	}
 	
 	/**
@@ -228,10 +236,8 @@ Ext.QuickTips.init();
 	 * @description removes a group node from the tree
 	 */
 	var removeGroupFromTree = function(_name){
-		extTree.root.removeChild(rosterGroups[_name]);
-		var w = rosterGroup;
-		w.remove(_key);
-		rosterGroup = w;
+		extTree.root.removeChild(rosterGroups.get(_name));
+		rosterGroups.remove(_name);
 	}
 	
 	/**
@@ -240,10 +246,8 @@ Ext.QuickTips.init();
 	 * @description removes a buddy node from the tree
 	 */
 	var removeBuddyFromTree = function(_jid){
-		rosterBuddys[_jid].parentNode.removeChild(rosterBuddys[_jid]);
-		var w = rosterBuddys;
-		w.remove(_key);
-		rosterBuddys = w;
+		rosterBuddys.get(_jid).parentNode.removeChild(rosterBuddys.get(_jid));
+		rosterBuddys.remove(_key);
 	}
 	
 	/**
@@ -252,200 +256,201 @@ Ext.QuickTips.init();
 	 * @description adds a buddy node to the tree
 	 */
 	var addBuddyToTree = function(f,a){
-		var _buddy = new Ext.tree.TreeNode({ //buddy adden
-				id:"blub",
-				status:"unavailable",
-				status_text:"blub",
-				jid:"blub",
-				subscription:"from",
-				hide:false,
-				text:"blub",
-				allowDrop:false
-		});
-		_buddy.on("contextmenu",buddyContext,this);
-		_buddy.on("dblclick",initChat,this);
-		extTree.root.findChild("gname","bla").appendChild(_buddy);
-		rosterBuddys.set("blub", _buddy);
-		
-		var _buddy = new Ext.tree.TreeNode({ //buddy adden
-				id:"blub2",
-				status:"unavailable",
-				status_text:"blub2",
-				jid:"blub2",
-				subscription:"from",
-				hide:false,
-				text:"blub2",
-				allowDrop:false
-		});
-		_buddy.on("contextmenu",buddyContext,this);
-		_buddy.on("dblclick",initChat,this);
-		extTree.root.findChild("gname","bla").appendChild(_buddy);
-		rosterBuddys.set("blub2", _buddy);
-		
-/*		var e = null;
+		var e = null;
 		if(a && a.response)
 			e = a.response.responseXML.firstChild;
 		else
 			e = a;	
 		if(e.getAttribute("type") == "success" || e.getAttribute("type") == "push"){
-			var buddys = ExtJame.backend.Xml.getBuddysFromResponse(e.getElementsByTagName("methodResponse")[0]);
-			for(var i=0;i<buddys.length;i++){
-				var buddy = buddys[i];
-				var appended = false;
-				if(buddy["name"])
-					var label = buddy["name"];
-				else{
-					var label = buddy["jid"];
-				}
+			if(f){
 				var _buddy = new Ext.tree.TreeNode({ //buddy adden
-						id:buddy["jid"],
-						status:buddy["status"],
-						status_text:buddy["status_text"],
-						jid:buddy["jid"],
-						subscription:buddy["subscription"],
+						id:f.findField("name").getValue(),
+						status:"subscription pending",
+						status_text:"offline",
+						jid:f.findField("name").getValue(),
+						subscription:"unsubscribed",
 						hide:false,
-						text:label,
-						icon:ExtJame.backend.url.baseurl+"images/jame/icon_"+buddy["status"]+".png",
+						text:f.findField("name").getValue(),
+						icon:"images/jame/icon_invisible.png",
 						allowDrag:true,
 						allowDrop:false,
-						qtip:"JID : "+buddy["jid"]+"<br/>Status : "+buddy["status"]+"<br/>Text : "+buddy["status_text"]+"<br/>Subscription : "+buddy["subscription"]
-				});
-				_buddy.on("contextmenu",buddyContext,this);
-				_buddy.on("dblclick",initChat,this);
-				if(buddy["group"]){
-					$H(rosterGroups).each(function(g){
-						if(buddy["group"] == g.key){
-							extTree.root.findChild("gname",g.key).appendChild(_buddy);
-							appended = true;
-						}
+						qtip:"JID : "+f.findField("name").getValue(),
 					});
+					_buddy.on("contextmenu",buddyContext,this);
+					_buddy.on("dblclick",initChat,this);
+					if(rosterGroups[f.findField("group").getValue()]){
+						$H(rosterGroups).each(function(g){
+							if(buddy["group"] == g.key){
+								extTree.root.findChild("gname",g.key).appendChild(_buddy);
+								appended = true;
+							}
+						});
+					}
+					if(!appended)
+						extTree.root.appendChild(_buddy);
+					_buddy.on("move",switchUserGroup,this);
+					rosterBuddys.set(f.findField("name").getValue(), _buddy);
+			}else{
+				var buddys = ExtJame.backend.Xml.getBuddysFromResponse(e.getElementsByTagName("methodResponse")[0]);
+				for(var i=0;i<buddys.length;i++){
+					var buddy = buddys[i];
+					var appended = false;
+					if(buddy["name"])
+						var label = buddy["name"];
+					else{
+						var label = buddy["jid"];
+					}
+					var _buddy = new Ext.tree.TreeNode({ //buddy adden
+							id:buddy["jid"],
+							status:buddy["status"],
+							status_text:buddy["status_text"],
+							jid:buddy["jid"],
+							subscription:buddy["subscription"],
+							hide:false,
+							text:label,
+							icon:ExtJame.backend.url.baseurl+"images/jame/icon_"+buddy["status"]+".png",
+							allowDrag:true,
+							allowDrop:false,
+							qtip:"JID : "+buddy["jid"]+"<br/>Status : "+buddy["status"]+"<br/>Text : "+buddy["status_text"]+"<br/>Subscription : "+buddy["subscription"]
+					});
+					_buddy.on("contextmenu",buddyContext,this);
+					_buddy.on("dblclick",initChat,this);
+					if(buddy["group"]){
+						$H(rosterGroups).each(function(g){
+							if(buddy["group"] == g.key){
+								extTree.root.findChild("gname",g.key).appendChild(_buddy);
+								appended = true;
+							}
+						});
+					}
+					if(!appended)
+						extTree.root.appendChild(_buddy);
+					_buddy.on("move",switchUserGroup,this);
+					rosterBuddys.set(buddy["jid"], _buddy);
 				}
-				if(!appended)
-					extTree.root.appendChild(_buddy);
-				_buddy.on("move",switchUserGroup,this);
-				rosterBuddys.set(buddy["jid"], _buddy);
 			}
-		}*/
+		}
 	}
-	
-	/**
-	 * @method init
-	 * @public
-	 * @description initializes the rostertree
-	 */
-	this.init = function(){
+	return {
+		/**
+		 * @method init
+		 * @public
+		 * @description initializes the rostertree
+		 */
+		init : function(){
 			if(!extTree)
 				extTree = createTree(ExtJame.backend.url.getbuddys);
-			return this;
-	}
+		},
 	
-	/**
-	 * @method getGroup
-	 * @private
-	 * @description returns the group matching the parameter
-	 */
-	this.getGroup = function(_name){
-			return rosterGroups[_name];
-	}
+		/**
+		 * @method getGroup
+		 * @private
+		 * @description returns the group matching the parameter
+		 */
+		getGroup : function(_name){
+			return rosterGroups.get(_name);
+		},
 	
-	/**
-	 * @method getBuddy
-	 * @public
-	 * @description returns the buddy matching the parameter
-	 */
-	this.getBuddy = function(_name){
-			return rosterBuddys[_name];
-	}
+		/**
+		 * @method getBuddy
+		 * @public
+		 * @description returns the buddy matching the parameter
+		 */
+		getBuddy : function(_name){
+			return rosterBuddys.get(_name);
+		},
 	
-	/**
-	 * @method getGroups
-	 * @public
-	 * @description returns all group nodes
-	 */
-	this.getGroups = function(){
-		return rosterGroups;
-	}
+		/**
+		 * @method getGroups
+		 * @public
+		 * @description returns all group nodes
+		 */
+		getGroups : function(){
+			return rosterGroups;
+		},
 	
-	/**
-	 * @method getBuddys
-	 * @public
-	 * @description returns alle buddy nodes
-	 */
-	this.getBuddys = function(){
-		return rosterBuddys;
-	}
+		/**
+		 * @method getBuddys
+		 * @public
+		 * @description returns alle buddy nodes
+		 */
+		getBuddys : function(){
+			return rosterBuddys;
+		},
 	
-	/**
-	 * @method addGroups
-	 * @public
-	 * @description adds a group to the tree
-	 */
-	this.addGroups = function(f,a){
-		addGroupToTree(f,a);
-		if(Ext.WindowMgr.get("AddGroupLayout"))
-			Ext.WindowMgr.get("AddGroupLayout").close();
-	}
+		/**
+		 * @method addGroups
+		 * @public
+		 * @description adds a group to the tree
+		 */
+		addGroups : function(f,a){
+			addGroupToTree(f,a);
+			if(Ext.WindowMgr.get("AddGroupDialog"))
+				Ext.WindowMgr.get("AddGroupDialog").close();
+		},
 	
-	/**
-	 * @method addBuddys
-	 * @public
-	 * @description adds a buddy to the tree
-	 */
-	this.addBuddys = function(f,a){
-		addBuddyToTree(f,a);
-		if(Ext.WindowMgr.get("AddBuddyLayout"))
-			Ext.WindowMgr.get("AddBuddyLayout").close();
-	}
+		/**
+		 * @method addBuddys
+		 * @public
+		 * @description adds a buddy to the tree
+		 */
+		addBuddys : function(f,a){
+			addBuddyToTree(f,a);
+			if(Ext.WindowMgr.get("AddBuddyDialog"))
+				Ext.WindowMgr.get("AddBuddyDialog").close();
+		},
 	
-	/**
-	 * @method removeGroup
-	 * @public
-	 * @description removes a group node from the tree
-	 */
-	this.removeGroup = function(_group){
-		removeGroupFromTree(_group);
-	}
+		/**
+		 * @method removeGroup
+		 * @public
+		 * @description removes a group node from the tree
+		 */
+		removeGroup : function(_group){
+			removeGroupFromTree(_group);
+		},
 	
-	/**
-	 * @method removeBuddy
-	 * @public
-	 * @description removes a buddy node from the tree
-	 */
-	this.removeBuddy = function(_jid){
-		removeBuddyFromTree(_jid);
-	}
+		/**
+		 * @method removeBuddy
+		 * @public
+		 * @description removes a buddy node from the tree
+		 */
+		removeBuddy : function(_jid){
+			removeBuddyFromTree(_jid);
+		},
 	
-	/**
-	 * @method getStore
-	 * @public
-	 * @description returns the groups array for an Ext.data.SimpleStore
-	 */
-	this.groupsArr = function(){
-		var groupsArr = Array();
-		rosterGroups.each(function(group){
-			var g = Array();
-			g.push(group.key);
-			g.push(group.key);
-			groupsArr.push(g);
-		});
-		return  groupsArr;
-	}
+		/**
+		 * @method getStore
+		 * @public
+		 * @description returns the groups array for an Ext.data.SimpleStore
+		 */
+		groupsArr : function(){
+			var groupsArr = Array();
+			rosterGroups.each(function(group){
+				var g = Array();
+				g.push(group.key);
+				g.push(group.key);
+				groupsArr.push(g);
+			});
+			return  groupsArr;
+		},
 	
-	/**
-	 * @method updateBuddy
-	 * @public
-	 * @description updates a buddy node
-	 */
-	this.updateBuddy = function(_attrs){
-		var buddy = rosterBuddys[_attrs["jid"]];
-		buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png";
-		buddy.attributes.status = _attrs['status'];
-		buddy.attributes.subscription = _attrs['subscription'];
-		var qtip = "JID : "+_attrs["from"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
-		if(buddy.getUI().textNode.setAttributeNS){
-        		buddy.getUI().textNode.setAttributeNS("ext", "qtip", qtip);
-        	}else{
-            	buddy.getUI().textNode.setAttribute("ext:qtip", qtip);
-			}
+		/**
+		 * @method updateBuddy
+		 * @public
+		 * @description updates a buddy node
+		 */
+		updateBuddy : function(buddy,_attrs){
+			if(_attrs["subscription"] == "unavailable")
+				_attrs["status"] = "unavailable";
+			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png",
+			buddy.attributes.status = _attrs['status'];
+			buddy.attributes.subscription = _attrs['subscription'];
+			var qtip = "JID : "+_attrs["from"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
+			if(buddy.getUI().textNode.setAttributeNS){
+				buddy.getUI().textNode.setAttributeNS("ext", "qtip", qtip);
+			}else{
+		    	buddy.getUI().textNode.setAttribute("ext:qtip", qtip);
+				}
+		}
 	}
 }

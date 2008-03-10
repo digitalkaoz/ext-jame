@@ -16,7 +16,7 @@ var ExtJame = {
 	connected : false,
 	roster: null,
 	//id:null,
-	myJid:"digitalkaoz",
+	myJid:"",
 
 	/**
 	 * @method initSession
@@ -33,8 +33,4 @@ var ExtJame = {
 				Ext.WindowMgr.each(function(win){win.show();})
 		}
 	}
-}
-
-window.close = function(){
-	alert("test");
-}
+}  

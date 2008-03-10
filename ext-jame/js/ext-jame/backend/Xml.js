@@ -129,14 +129,14 @@ ExtJame.backend.Xml = {
 	 * 		creates a chat if it doesnt exists, modifies buddy attributes or adds new buddys
 	 */
 	parseNotifications : function(XmlEl){
-		if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "push"){ //incoming notification
+		if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "success"){ //incoming notification
 			var response = XmlEl.getElementsByTagName("methodResponse")[0];
 			var messages = ExtJame.backend.Xml.getMessagesFromResponse(response);
 			var buddys = ExtJame.backend.Xml.getBuddysFromResponse(response);
 
 			if(messages.length > 0){	// messages were found so create a chat or appends the message
 				for(var i=0;i<messages.length;i++){
-					if(Ext.ComponentMgr.get(messages[i]["from"]){ // chat exists
+					if(Ext.ComponentMgr.get(messages[i]["from"])){ // chat exists
 						var pDlg = Ext.ComponentMgr.get(messages[i]["from"]).parent;
 						Ext.WindowMgr.get(pDlg).show();
 						Ext.WindowMgr.get(pDlg).getComponent(0).activate(messages[i]["from"]);
@@ -155,27 +155,33 @@ ExtJame.backend.Xml = {
 			}
 			if(buddys.length > 0){		// buddys were found the modify details or append the buddy to the tree
 				for(var i=0;i<buddys.length;i++){
-					if(buddys[i]["subscription"] == "from"){	//ask for subscription request
+					if(buddys[i]["status"] == "subscribe"){	//ask for subscription request
 						var buddy = buddys[i];
 						var addem = function(btn){
 							if(btn == "yes"){
-								ExtJame.backend.Connection.sendSubscription(this["jid"],"subscribed");
+								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribed");
 							}else{
-								ExtJame.backend.Connection.sendSubscription(this["jid"],"unsubscribed");
+								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"unsubscribed");
 							}
 						}
-						Ext.Msg.show({
+						Ext.MessageBox.show({
 					 		title:'Authorization Request',
 					 		msg: 'Accept Authorization Request from '+buddy["jid"]+" ?",
 					 		buttons: Ext.MessageBox.YESNO,
-							icon:Ext.MessageBox.QUESTION
-							fn: addem,
-							scope:buddy
+							icon:Ext.MessageBox.QUESTION,
+							fn: addem
 						});
 					}else{
 						var buddy = ExtJame.roster.getBuddy(buddys[i]["jid"]);
 						if(buddy){
-							ExtJame.roster.updateBuddy(buddy);
+							ExtJame.roster.updateBuddy(buddy,buddys[i]);
+							if(Ext.ComponentMgr.get(buddys[i]["jid"])){
+									var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
+									var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
+									tabSpan.removeClass(oldIconClass);
+									Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
+									tabSpan.addClass(buddys[i]["status"]);
+							}
 						}else{
 							ExtJame.roster.addBuddys(null,XmlEl);
 						}
