@@ -147,3 +147,25 @@ div#update-container {
 	font-size:10pt;
 	color:gray;
 }
+
+.available{
+	background-image:url('../images/jame/icon_available.png') !important
+}
+.unavailable{
+	background-image:url('../images/jame/icon_unavailable.png') !important
+}
+.xa{
+	background-image:url('../images/jame/icon_xa.png') !important
+}
+.dnd{
+	background-image:url('../images/jame/icon_dnd.png') !important
+}
+.away{
+	background-image:url('../images/jame/icon_away.png') !important
+}
+.chat{
+	background-image:url('../images/jame/icon_chat.png') !important
+}
+.invisible{
+	background-image:url('../images/jame/icon_invisible.png') !important
+}
