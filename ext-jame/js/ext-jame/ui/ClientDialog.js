@@ -46,7 +46,7 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 				triggerAction: 'all',
 				id:'status-box',
 				emptyText:'your Status...',
-				selectOnFocus:true,
+				selectOnFocus:true
 			}]
 		});
 		extDialog.getComponent(1).add(status);
@@ -71,9 +71,9 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 		 * @description initializes the dialog
 		 */
 		init : function(){
-			if(!extDialog)
+			if(!extDialog){
 				createDialog();
+			}
 		}	
 	}
 }
-

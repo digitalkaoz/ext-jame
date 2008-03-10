@@ -30,8 +30,9 @@ ExtJame.ui.SimpleDialog = function( _opener, _config){
 		 * 
 		 */
 		init : function(){
-			if(!extDialog)
+			if(!extDialog){
 				createDialog();
+			}
 		}
 	}
 }

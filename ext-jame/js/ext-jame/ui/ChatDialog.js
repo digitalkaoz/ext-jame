@@ -37,7 +37,7 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 	            animScroll:true,
 	            autoScroll:true,
 	            enableTabScroll:true,
-	            layoutOnTabChange:true,
+	            layoutOnTabChange:true
 	        }]
 		});
 		extDialog.getComponent(0).on("tabchange", tabChange,extDialog.getComponent(0));		
@@ -127,7 +127,7 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 						border:0,
 						height:150,
 						xtype:'panel',
-						autoScroll : true,
+						autoScroll : true
 					},{
 						region:'south',
 						minHeight:150,
