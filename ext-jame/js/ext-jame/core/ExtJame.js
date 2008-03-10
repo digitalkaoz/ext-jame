@@ -16,7 +16,7 @@ var ExtJame = {
 	connected : false,
 	roster: null,
 	myJid:"",
-	hud:null,
+	hud:Ext.getBody(),
 
 	/**
 	 * @method initSession
