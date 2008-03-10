@@ -10,6 +10,7 @@
 		<script id="script_ext-all" src="js/ext2/ext-all.js" type="text/javascript"></script>
 		<link rel="stylesheet" type="text/css" href="js/ext2/resources/css/ext-all.css"></link>
 
+<!-- dev sources-->
 		<script id="script_Jame" src="js/ext-jame/core/ExtJame.js" type="text/javascript"></script>
 		<script id="script_Factory" src="js/ext-jame/core/Factory.js" type="text/javascript"></script>
 		<script id="script_Connection" src="js/ext-jame/backend/Connection.js" type="text/javascript"></script>
@@ -19,6 +20,9 @@
 		<script id="script_ChatDialog" src="js/ext-jame/ui/ChatDialog.js" type="text/javascript"></script>
 		<script id="script_UiConfig" src="js/ext-jame/ui/Config.js" type="text/javascript"></script>
 		<script id="script_Xml" src="js/ext-jame/backend/Xml.js" type="text/javascript"></script>
+<!-- packed source
+		<script id="script_ExtJame-all" src="js/ext-jame/ExtJame-all.js" type="text/javascript"></script>
+-->
 		<link rel="stylesheet" type="text/css" href="css/jame.css" />
 
 	</head>
