@@ -49,6 +49,7 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 		});
 		extDialog.getComponent(1).add(status);
 		status.findById("status-box").on("select",changeState,status);
+		status.findById("status-box").on("specialkey",changeState,status);
 		ExtJame.roster = new ExtJame.ui.RosterTree(extDialog.getComponent('buddy-panel'));
 		ExtJame.roster.init();
 		extDialog.doLayout();
@@ -58,10 +59,19 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 	 * 
 	 */
 	var changeState = function(_box,_newval,_oldval){
-		_box.ownerCt.form.submit({
-			reset:false,
-			scope: this
-		});
+		if(_newval.ENTER){
+			_box.ownerCt.form.submit({
+				baseParams:{message:_box.findById("status-box").lastSelectionText},
+				reset:false,
+				scope: this
+			});
+		}else if(_newval.data){
+			_box.ownerCt.form.submit({
+				baseParams:{message:_box.lastSelectionText},
+				reset:false,
+				scope: this
+			});
+		}
 	}
 
 	return {

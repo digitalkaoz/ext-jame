@@ -6,7 +6,7 @@
 
 /**
  * @class ExtJame.ui.ChatDialog
- * @description provides a dialog, which is able to store Chats ( ChatForms) in Tabs, you can drop buddy on it for new chats
+ * @description provides a dialog, which is able to store Chats (ChatForms) in Tabs, you can drop buddy on it for new chats
  */
 ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 
