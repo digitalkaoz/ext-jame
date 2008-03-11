@@ -9,15 +9,7 @@
  * @description some helpers functions
  */
 ExtJame.factory = {
-	/**
-	 * @method getGroupsStore
-	 * @public
-	 * @description returns the roster groups as an ext.data.simplestore
-	 */
-	groupsStore : new Ext.data.SimpleStore({
-		fields: ["value", "text"],
-		data : ExtJame.roster ? ExtJame.roster.groupsArr() : []
-	}),
+
 	/**
 	 * @method statusStore
 	 * @public
@@ -33,7 +25,8 @@ ExtJame.factory = {
 				["unavailable","Unavailable"]
 			]
 	}),
-			/**
+
+	/**
 	 * @method sendMessage
 	 * @private
 	 * @descriptions sends a message to user
@@ -115,9 +108,10 @@ ExtJame.factory = {
 	 * @description creates a new SimpleDialog with a SimpleForm for adding users to the roster
 	 */
 	addBuddy : function(e){
-		if(!Ext.WindowMgr.get("AddBuddyDialog"))
+		if(!Ext.WindowMgr.get("AddBuddyDialog")){
 			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AddBuddyLayout).init();
-		else
+			Ext.WindowMgr.get("AddBuddyDialog").getComponent(0).findByType("combo")[0].store.loadData(ExtJame.roster.groupsArr());
+		}else
 			Ext.WindowMgr.get("AddBuddyDialog").show();
 	},
 
@@ -172,5 +166,12 @@ ExtJame.factory = {
 			else
 				Ext.WindowMgr.get("LoginDialog").show();
 		}
-	}
+	},
+	
+	/**
+	 * 
+	 */
+	 cutJid : function (jid){
+	 	return jid.substring(0,jid.indexOf("@"));
+	 }
 }

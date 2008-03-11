@@ -22,17 +22,12 @@ ExtJame.backend.Connection = {
 			container.id = "update-container";
 			document.body.appendChild(container);
 		}
-		container = $('update-container');
-		var upd = new Ajax.PeriodicalUpdater(container, 
-			ExtJame.backend.url.getnotifications, 
-			{method: 'get',
-			frequency: 1, 
-			decay: 1,
-			onSuccess : function(transport){	//parse the response
-				ExtJame.backend.Xml.parseNotifications(transport.responseXML.firstChild);
-			},
-			onFailure : function(){}
-		});
+		var update = function(el,ret){
+			ExtJame.backend.Xml.parseNotifications(ret.responseXML.firstChild);
+		}
+		var mgr = new Ext.Updater("update-container");
+		mgr.startAutoRefresh(2, ExtJame.backend.url.getnotifications);
+		mgr.on("update", update);
 	},
 
 	/**
@@ -218,7 +213,7 @@ ExtJame.backend.Connection = {
 		var parseDom = function(XmlEl){
 			// TODO
 		}
-		ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({newg:_new,oldg:_old,buddy:_jid}));
+		ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({newg:_new,oldg:_old,name:_jid}));
 	},
 	
 	/**

@@ -39,7 +39,7 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 				displayField:'text',
 				valueField:'value',
 				typeAhead: true,
-				name:'mode',
+				name:'message',
 				mode: 'local',
 				triggerAction: 'all',
 				id:'status-box',
@@ -59,18 +59,23 @@ ExtJame.ui.ClientDialog = function(_opener, _config){
 	 * 
 	 */
 	var changeState = function(_box,_newval,_oldval){
-		if(_newval.ENTER){
-			_box.ownerCt.form.submit({
-				baseParams:{message:_box.findById("status-box").lastSelectionText},
-				reset:false,
-				scope: this
-			});
-		}else if(_newval.data){
-			_box.ownerCt.form.submit({
-				baseParams:{message:_box.lastSelectionText},
-				reset:false,
-				scope: this
-			});
+		Ext.WindowMgr.get("ClientDialog").setIconClass(_box.value);
+		try{
+			if(_newval.ENTER){
+				_box.ownerCt.form.submit({
+					params:{mode:_box.value},
+					reset:false,
+					scope: this
+				});
+			}else if(_newval.data){
+				_box.ownerCt.form.submit({
+					params:{mode:_box.value},
+					reset:false,
+					scope: this
+				});
+			}
+		}catch(e){
+			//TODO
 		}
 	}
 

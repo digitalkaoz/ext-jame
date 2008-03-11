@@ -115,14 +115,9 @@ ExtJame.ui.RosterTree = function(_parent){
 				handler: ExtJame.backend.Connection.removeBuddy ,
 				node:_node, 
 				icon:"images/jame/user_delete.png"});
-		if(_node.attributes.subscription == "from")
-			items.push({ 	text: 'subscribed', 
-					handler: subscribedBuddy ,
-					node:_node, 
-					icon:"images/jame/group_link.png"});
-		else if(_node.attributes.subscription == "none" || _node.attributes.subscription == "to")
+		if(_node.attributes.subscription == "none" || _node.attributes.subscription == "to" || _node.attributes.subscription == "from")
 			items.push({ 	text: 'subscribe', 
-					handler: subscribeBuddy ,
+					handler: subscribedBuddy ,
 					node:_node, 
 					icon:"images/jame/group_go.png"});
 		var menu = new Ext.menu.Menu({ 
@@ -170,12 +165,10 @@ ExtJame.ui.RosterTree = function(_parent){
 		if(!anchor)
 			anchor = ExtJame.hud;
 		if(Ext.ComponentMgr.get(jid)){
-			Ext.WindowMgr.get(jid).show();
-			Ext.WindowMgr.get(jid).getComponent(0).activate(jid);
+			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).show();
+			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).getComponent(0).activate(jid);
 		}else{
-			ts = new Date().getTime();
-			uid ="mw_"+ts;
-			new ExtJame.ui.ChatDialog(uid,anchor,ExtJame.ui.UiConfig.ChatLayout,jid).init();
+			new ExtJame.ui.ChatDialog(ExtJame.ui.UiConfig.ChatLayout,jid).init();
 		}
 	}
 	
@@ -422,7 +415,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		},
 	
 		/**
-		 * @method getStore
+		 * @method groupsArr
 		 * @public
 		 * @description returns the groups array for an Ext.data.SimpleStore
 		 */

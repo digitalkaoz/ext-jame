@@ -74,6 +74,7 @@ ExtJame.ui.UiConfig = {
 		closable:false,
 		plain:true,
 		border:false,
+		iconCls : "available",
 		layout:'border',
 		tbar: new Ext.Toolbar({
 			items:[{
@@ -225,7 +226,9 @@ ExtJame.ui.UiConfig = {
 			},{
 				xtype:'combo',
 				fieldLabel: "Group",
-				store:ExtJame.factory.groupsStore, 
+				store:new Ext.data.SimpleStore({
+					fields: ["value", "text"]
+				}),
 				name: 'group',
 				displayField: 'value',
 				valueField : 'value',
