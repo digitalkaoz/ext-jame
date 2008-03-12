@@ -187,7 +187,7 @@ ExtJame.ui.RosterTree = function(_parent){
 			if(f){
 				var _group = new Ext.tree.TreeNode({ //group adden
 								text:f.findField("name").getValue(),
-								iconCls:"display:none;",
+								iconCls:"display:none!important;",
 								expanded:true,
 								expandable:true,
 								allowDrag:false,
