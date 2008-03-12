@@ -1,4 +1,5 @@
 /**
+/**
 *	Licence	:	GPL
 *	Author	:	Robert Schönthal
 *	Date	:	16.08.2007
@@ -94,7 +95,7 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 		this.ownerCt.ownerCt.getComponent(0).body.insertHtml("beforeEnd",myText);
 		this.ownerCt.form.items.items[0].reset();
 		p = this.ownerCt.ownerCt.getComponent(0); 
-		p.getEl().scroll("bottom",p.getY() - p.dom.scrollTop,true)
+		//p.getEl().scroll("bottom",p.getEl().getY() - p.getEl().dom.scrollTop,true)
 	}
 
 	/**
