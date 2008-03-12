@@ -168,7 +168,7 @@ ExtJame.ui.RosterTree = function(_parent){
 			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).show();
 			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).getComponent(0).activate(jid);
 		}else{
-			new ExtJame.ui.ChatDialog(ExtJame.ui.UiConfig.ChatLayout,jid).init();
+			new ExtJame.ui.ChatDialog(anchor,ExtJame.ui.UiConfig.ChatLayout,jid).init();
 		}
 	}
 	
@@ -202,7 +202,7 @@ ExtJame.ui.RosterTree = function(_parent){
 				for(var i=0;i<groups.length;i++){
 					var _group = new Ext.tree.TreeNode({ //group adden
 									text:groups[i],
-									iconCls:"display:none",
+									iconCls:"display:none;",
 									expanded:true,
 									expandable:true,
 									allowDrag:false,
@@ -264,7 +264,7 @@ ExtJame.ui.RosterTree = function(_parent){
 						status:"subscription pending",
 						status_text:"offline",
 						jid:f.findField("name").getValue(),
-						subscription:"unsubscribed",
+						subscription:"subscribe",
 						hide:false,
 						text:f.findField("name").getValue(),
 						icon:"images/jame/icon_invisible.png",
@@ -436,12 +436,10 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description updates a buddy node
 		 */
 		updateBuddy : function(buddy,_attrs){
-			if(_attrs["subscription"] == "unavailable")
-				_attrs["status"] = "unavailable";
 			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png",
 			buddy.attributes.status = _attrs['status'];
 			buddy.attributes.subscription = _attrs['subscription'];
-			var qtip = "JID : "+_attrs["from"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
+			var qtip = "JID : "+_attrs["jid"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
 			if(buddy.getUI().textNode.setAttributeNS){
 				buddy.getUI().textNode.setAttributeNS("ext", "qtip", qtip);
 			}else{

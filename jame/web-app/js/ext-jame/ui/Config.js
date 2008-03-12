@@ -78,9 +78,32 @@ ExtJame.ui.UiConfig = {
 		layout:'border',
 		tbar: new Ext.Toolbar({
 			items:[{
-				text:'Roster',
-				tooltip:'manage my buddys',
+				xtype:'tbbutton',
+				icon: 'images/jame/information.png',
+				handler:ExtJame.factory.showAbout,
+				tooltip:'About',
+				cls: 'x-btn-icon',
+			},{xtype: 'tbseparator'},{
+				text:'Profile',
+				tooltip:'my personal settings',
 				menu: {
+					id: 'ToolMenu',
+					items: [{
+						text: 'Preferences',
+						icon: 'images/jame/cog_edit.png',
+						disabled:true,
+						handler:ExtJame.factory.showPreferences
+					},{
+					 	text: 'Profile',
+						icon: 'images/jame/vcard_edit.png',
+						disabled:true,
+						handler:ExtJame.factory.showVCard
+					 }]
+				}
+			},{xtype: 'tbseparator'},{
+					text:'Roster',
+					tooltip:'manage my buddys',
+					menu: {
 					id:"BuddysMenu",
 					items:[{
 		        		text: 'Send Message',
@@ -114,29 +137,6 @@ ExtJame.ui.UiConfig = {
 						handler:ExtJame.backend.Connection.logout
 					}]
 				}
-			},{xtype: 'tbseparator'},{
-				text:'Profile',
-				tooltip:'my personal settings',
-				menu: {
-					id: 'ToolMenu',
-					items: [{
-						text: 'Preferences',
-						icon: 'images/jame/cog_edit.png',
-						disabled:true,
-						handler:ExtJame.factory.showPreferences
-					},{
-					 	text: 'Profile',
-						icon: 'images/jame/vcard_edit.png',
-						disabled:true,
-						handler:ExtJame.factory.showVCard
-					 }]
-				}
-			},{xtype: 'tbseparator'},{
-				xtype:'tbbutton',
-				icon: 'images/jame/information.png',
-				handler:ExtJame.factory.showAbout,
-				tooltip:'About',
-				cls: 'x-btn-icon',
 			}]
 		}),
 		items:[{

@@ -8,11 +8,11 @@
  * @class ExtJame.ui.ChatDialog
  * @description provides a dialog, which is able to store Chats (ChatForms) in Tabs, you can drop buddy on it for new chats
  */
-ExtJame.ui.ChatDialog = function( _config, _jid){
+ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 
 	var extDialog = null;
 	var config = _config;
-	var opener = ExtJame.hud;
+	var opener = _opener;
 	var dd = null;
 	var jid = _jid;
 
@@ -93,7 +93,8 @@ ExtJame.ui.ChatDialog = function( _config, _jid){
  		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+this.ownerCt.form.items.items[0].getValue()+"<br/>";
 		this.ownerCt.ownerCt.getComponent(0).body.insertHtml("beforeEnd",myText);
 		this.ownerCt.form.items.items[0].reset();
-		this.ownerCt.ownerCt.getComponent(0).getEl().scroll("bottom",1000,true)
+		p = this.ownerCt.ownerCt.getComponent(0); 
+		p.getEl().scroll("bottom",p.getY() - p.dom.scrollTop,true)
 	}
 
 	/**

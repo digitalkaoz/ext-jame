@@ -155,12 +155,12 @@ ExtJame.backend.Xml = {
 					Ext.WindowMgr.get(pDlg).show();
 					Ext.WindowMgr.get(pDlg).getComponent(0).activate(messages[i]["from"]);
 				}else{ // chat doesnt exists
-					new ExtJame.ui.ChatDialog(ExtJame.ui.UiConfig.ChatLayout,messages[i]["from"]).init();
+					new ExtJame.ui.ChatDialog(ExtJame.hud,ExtJame.ui.UiConfig.ChatLayout,messages[i]["from"]).init();
 				}
 				var panel = Ext.ComponentMgr.get(messages[i]["from"]).getComponent(0);
 				var d = new Date();
 				var ts = d.getHours()+":"+d.getMinutes();
-		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"]</b>"+messages[i]["msg"]+"<br/>";
+		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"] </b>"+messages[i]["msg"]+"<br/>";
 				panel.body.insertHtml("beforeEnd",btext);
 				panel.getEl().scroll("bottom",1000,true);
 			}
@@ -179,13 +179,8 @@ ExtJame.backend.Xml = {
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribe");
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribed");
 								if(node){
-									ExtJame.roster.updateBuddy(node,buddy);
 									if(Ext.ComponentMgr.get(buddy["jid"])){
-											var oldIconClass = Ext.ComponentMgr.get(buddy["jid"]).iconCls;
-											var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddy["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddy["jid"]))).child('span.x-tab-strip-text');
-											tabSpan.removeClass(oldIconClass);
-											Ext.ComponentMgr.get(buddy["jid"]).iconCls = buddy["status"];
-											tabSpan.addClass(buddy["status"]);
+											ExtJame.roster.updateBuddy(node,buddy);
 									}else
 										ExtJame.roster.addBuddys(null,XmlEl);
 								}
@@ -201,22 +196,21 @@ ExtJame.backend.Xml = {
 							icon:Ext.MessageBox.QUESTION,
 							fn: addem
 						});
-					}else{
+					}else{ // presence updates
 						var buddy = ExtJame.roster.getBuddy(buddys[i]["jid"]);
 						if(buddy){
 							ExtJame.roster.updateBuddy(buddy,buddys[i]);
 							if(Ext.ComponentMgr.get(buddys[i]["jid"])){
-									var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
-									var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
-									tabSpan.removeClass(oldIconClass);
-									Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
-									tabSpan.addClass(buddys[i]["status"]);
+								var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
+								var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
+								tabSpan.removeClass(oldIconClass);
+								Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
+								tabSpan.addClass(buddys[i]["status"]);
 							}
 						}else{
-							ExtJame.roster.addBuddys(null,XmlEl);
+							//ExtJame.roster.addBuddys(null,XmlEl);
 						}
 					}
 				}
 	 }
-	
 }

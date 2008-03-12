@@ -50,7 +50,7 @@ Ext.onReady(function(){
 /**
  * provides scrollTo for panels
  */
-/*Ext.override(Ext.Element, {
+Ext.override(Ext.Element, {
     scrollTo : function(side, value, animate){
     	var side = side.toLowerCase();
         var prop;
@@ -79,4 +79,4 @@ Ext.onReady(function(){
         }
         return this;
     }
-});*/
+});
