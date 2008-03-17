@@ -128,7 +128,7 @@ a#logo{
 	top:5%;
 	left:20%;
 }
-input#jame-hud{
+#jame-container{
 	z-index:1;
 	position:absolute;
 	right:20px;
