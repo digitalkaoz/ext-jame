@@ -39,9 +39,11 @@ ExtJame.backend.Connection = {
 		f.ownerCt.form.submit({
 			reset:false,
 			scope: this,
+			waitMsg:"connecting...",
 			success:function(r){
-						ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
-					}
+				Ext.MessageBox.hide();
+				ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
+			}
 		});
 	},
 
@@ -75,11 +77,15 @@ ExtJame.backend.Connection = {
 	 */
 	logout : function(){
 		var exit = function(btn){
-			Ext.Msg.getDialog().close();
+			Ext.MessageBox.hide();
 			if(btn == "yes"){
 				var parseDom = function(e){
 					if(e.getAttribute("type") == "success"){	
-						window.location.reload();
+						Ext.WindowMgr.each(function(win){win.close()});
+						Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
+						ExtJame.connected = false;
+						ExtJame.mgr.stopAutoRefresh();
+			    		ExtJame.timer.stop();
 					}else{
 						// TODO
 						window.location.reload();

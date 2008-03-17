@@ -159,15 +159,17 @@ ExtJame.factory = {
 			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
 			ExtJame.timer = new PeriodicalExecuter(function(pe) {
 					if (new Date().getTime() - $('jame-hud').getAttribute("lastActivity") > 60000){
-						Ext.WindowMgr.each(function(win){win.close()});
-						ExtJame.connected = false;
-						ExtJame.mgr.stopAutoRefresh();
-			    		pe.stop();
-						Ext.Msg.show({
+						Ext.MessageBox.show({
 					 		title:'Error Occured',
 					 		msg: 'Backend out of sync',
 					 		buttons: Ext.MessageBox.OK,
-							icon:Ext.MessageBox.ERROR
+							icon:Ext.MessageBox.ERROR,
+							fn:function(e){
+								Ext.WindowMgr.each(function(win){win.close()});
+								ExtJame.connected = false;
+								ExtJame.mgr.stopAutoRefresh();
+			    				pe.stop();
+							}
 						});
 					}
 			}, 30);

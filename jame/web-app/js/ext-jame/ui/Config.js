@@ -76,8 +76,7 @@ ExtJame.ui.UiConfig = {
 		border:false,
 		iconCls : "available",
 		layout:'border',
-		tbar: new Ext.Toolbar({
-			items:[{
+		tbar: [{
 				xtype:'tbbutton',
 				icon: 'images/jame/information.png',
 				handler:ExtJame.factory.showAbout,
@@ -137,8 +136,7 @@ ExtJame.ui.UiConfig = {
 						handler:ExtJame.backend.Connection.logout
 					}]
 				}
-			}]
-		}),
+		}],
 		items:[{
 			region:'center',
 			minHeight:150,
@@ -148,10 +146,27 @@ ExtJame.ui.UiConfig = {
 		},{
 			region:'south',
 			id:'status-container',
-			height:30,
-			bodyStyle:'background:transparent;padding-top:5px;',
-			layout:'fit',
-			border:false
+			height:27,
+			bodyStyle:'background:transparent;padding:5px;',
+			border:false,
+			xtype:'form',
+			hideLabels:true,
+			method:'POST',
+			url:ExtJame.backend.url.setpresence,
+			bodyBorder:false,
+			items:[{
+				xtype:'combo',
+				store:ExtJame.factory.statusStore, 
+				displayField:'text',
+				valueField:'value',
+				typeAhead: true,
+				name:'message',
+				mode: 'local',
+				triggerAction: 'all',
+				id:'status-box',
+				emptyText:'your Status...',
+				selectOnFocus:true
+			}]
 		}]
 	},
 	AddGroupLayout : {

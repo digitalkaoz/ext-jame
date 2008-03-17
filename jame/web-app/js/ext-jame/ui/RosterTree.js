@@ -43,7 +43,7 @@ ExtJame.ui.RosterTree = function(_parent){
 					addBuddyToTree(null,doc.documentElement);	//add buddys
 				}
 			}
-		}, function(){parent.add(extTree)}, extTree);
+		}, function(){parent.add(extTree); parent.doLayout();}, extTree);
 		return extTree;
 	}
 	
