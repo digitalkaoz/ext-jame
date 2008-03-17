@@ -130,6 +130,7 @@ ExtJame.backend.Xml = {
 	 */
 	parseNotifications : function(XmlEl){
 		if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "success"){ //incoming notification
+			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
 			var response = XmlEl.getElementsByTagName("methodResponse")[0];
 			var messages = ExtJame.backend.Xml.getMessagesFromResponse(response);
 			var buddys = ExtJame.backend.Xml.getBuddysFromResponse(response);

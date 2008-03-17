@@ -26,7 +26,7 @@ ExtJame.ui.RosterTree = function(_parent){
 				rootVisible:false,
 				lines:false,
 				ddGroup: "buddys",
-				border:false,
+				border:false
 				
 		});
 		extTree.setRootNode(new Ext.tree.TreeNode({
@@ -270,7 +270,7 @@ ExtJame.ui.RosterTree = function(_parent){
 						icon:"images/jame/icon_invisible.png",
 						allowDrag:true,
 						allowDrop:false,
-						qtip:"JID : "+f.findField("name").getValue(),
+						qtip:"JID : "+f.findField("name").getValue()
 					});
 					_buddy.on("contextmenu",buddyContext,this);
 					_buddy.on("dblclick",initChat,this);

@@ -156,15 +156,37 @@ ExtJame.factory = {
 			else
 				Ext.WindowMgr.get("ClientDialog").show();
 			ExtJame.connected = true;
+			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
+			ExtJame.timer = new PeriodicalExecuter(function(pe) {
+					if (new Date().getTime() - $('jame-hud').getAttribute("lastActivity") > 60000){
+						Ext.WindowMgr.each(function(win){win.close()});
+						ExtJame.connected = false;
+						ExtJame.mgr.stopAutoRefresh();
+			    		pe.stop();
+						Ext.Msg.show({
+					 		title:'Error Occured',
+					 		msg: 'Backend out of sync',
+					 		buttons: Ext.MessageBox.OK,
+							icon:Ext.MessageBox.ERROR
+						});
+					}
+			}, 30);
 			if(Ext.WindowMgr.get("LoginDialog"))
 				Ext.WindowMgr.get("LoginDialog").close();
 			ExtJame.backend.Connection.getNotifications();
 		}else{	// no is not connected,show the login widget
+				/*Ext.Msg.show({
+			 		title:'Error Occured',
+			 		msg: 'Could not Connect',
+			 		buttons: Ext.MessageBox.OK,
+					icon:Ext.MessageBox.ERROR
+				});*/
 			ExtJame.connected = false;
 			if(!Ext.WindowMgr.get("LoginDialog"))
 				new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.LoginLayout).init();
 			else
 				Ext.WindowMgr.get("LoginDialog").show();
+				Ext.WindowMgr.get("LoginDialog").getComponent(0).getForm.reset();
 		}
 	},
 	

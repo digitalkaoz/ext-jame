@@ -82,7 +82,7 @@ ExtJame.ui.UiConfig = {
 				icon: 'images/jame/information.png',
 				handler:ExtJame.factory.showAbout,
 				tooltip:'About',
-				cls: 'x-btn-icon',
+				cls: 'x-btn-icon'
 			},{xtype: 'tbseparator'},{
 				text:'Profile',
 				tooltip:'my personal settings',
@@ -174,7 +174,7 @@ ExtJame.ui.UiConfig = {
 				name: 'name',
 				allowBlank:false,
 				msgTarget:'side',
-				anchor:"90%",
+				anchor:"90%"
 			}],
 			buttons :[{
 				text:"Add Group",
@@ -195,7 +195,7 @@ ExtJame.ui.UiConfig = {
 			html:'<center><h2>ext-jame</h2><p>a javascript jabber messenger</p><p>&copy; 2008 by Robert Schoenthal</p><p>caziel@digitalkaoz.net</p><p>licence: GPL</p></center>',
 			bodyStyle:'background:transparent;',
 			bodyBorder:false,
-			border:false,
+			border:false
 		}],
 		buttons:[{
 			text:"Close",

@@ -12,11 +12,12 @@ var ExtJame = {
 	ui : {},				// widgets, forms, uiconfigs
 	backend : {},	// the backend Adapter with urls, functions and xml parsers
 	factory : {},		// factory for generating dialogs
-	chats : new Hash(),
 	connected : false,
 	roster: null,
 	myJid:"",
 	hud:Ext.getBody(),
+	mgr:null,
+	timer: null,
 
 	/**
 	 * @method initSession
@@ -80,3 +81,7 @@ Ext.override(Ext.Element, {
         return this;
     }
 });
+
+window.onunload = function(){
+	//ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.logout, function(){});	
+}

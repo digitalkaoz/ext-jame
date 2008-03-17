@@ -25,9 +25,9 @@ ExtJame.backend.Connection = {
 		var update = function(el,ret){
 			ExtJame.backend.Xml.parseNotifications(ret.responseXML.firstChild);
 		}
-		var mgr = new Ext.Updater("update-container");
-		mgr.startAutoRefresh(2, ExtJame.backend.url.getnotifications);
-		mgr.on("update", update);
+		ExtJame.mgr = new Ext.Updater("update-container");
+		ExtJame.mgr.startAutoRefresh(2, ExtJame.backend.url.getnotifications);
+		ExtJame.mgr.on("update", update);
 	},
 
 	/**
