@@ -26,8 +26,6 @@ var ExtJame = {
 	 */
 	init : function(){
 		//turn on quicktips
-		Ext.QuickTips.init();
-    	
 		if(!ExtJame.connected)
 			ExtJame.backend.Connection.isConnected();
 		else{
@@ -49,6 +47,7 @@ var ExtJame = {
 Ext.onReady(function(){
 	$("jame-container").innerHTML= '<input type="button" id="jame-hud" value="start Client" />';
     ExtJame.hud = Ext.get('jame-hud');
+	Ext.QuickTips.init();
     if(ExtJame.hud)
     	ExtJame.hud.on('click', ExtJame.init);
 });

@@ -195,7 +195,10 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	var addPanel = function(tabpanel,jid){
 		if(!Ext.ComponentMgr.get(jid)){
 			var chatPanel = createPanel(jid);
-			chatPanel.setIconClass(ExtJame.roster.getBuddy(jid).attributes.status);
+			if(ExtJame.roster && ExtJame.roster.getBuddy(jid))
+				chatPanel.setIconClass(ExtJame.roster.getBuddy(jid).attributes.status);
+			else
+				chatPanel.setIconClass("unavailable");
 			tabpanel.add(chatPanel);
 			Ext.ComponentMgr.register(chatPanel);
 			tabpanel.activate(chatPanel.id);

@@ -34,17 +34,20 @@ ExtJame.ui.RosterTree = function(_parent){
 				allowDrag:false,
 				expanded:true
 		}));
-		var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
-		p.load(null, {	//if load was complete
-			read: function(response) {
-				if(response && response.responseXML){
-					var doc = response.responseXML;
-					addGroupToTree(null,doc.documentElement);	//add groups
-					addBuddyToTree(null,doc.documentElement);	//add buddys
+		try{
+			var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
+			p.load(null, {	//if load was complete
+				read: function(response) {
+					if(response && response.responseXML){
+						var doc = response.responseXML;
+						addGroupToTree(null,doc.documentElement);	//add groups
+						addBuddyToTree(null,doc.documentElement);	//add buddys
+					}
 				}
-			}
-		}, function(){parent.add(extTree); parent.doLayout();}, extTree);
-		return extTree;
+			}, function(){parent.add(extTree); parent.doLayout();}, extTree);
+		}catch(e){
+			parent.add(extTree); parent.doLayout();
+		}
 	}
 	
 	/**
@@ -304,7 +307,7 @@ ExtJame.ui.RosterTree = function(_parent){
 							subscription:buddy["subscription"],
 							hide:false,
 							text:label,
-							icon:ExtJame.backend.url.baseurl+"images/jame/icon_"+buddy["status"]+".png",
+							icon:"images/jame/icon_"+buddy["status"]+".png",
 							allowDrag:true,
 							allowDrop:false,
 							qtip:"JID : "+buddy["jid"]+"<br/>Status : "+buddy["status"]+"<br/>Text : "+buddy["status_text"]+"<br/>Subscription : "+buddy["subscription"]
@@ -335,7 +338,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		 */
 		init : function(){
 			if(!extTree)
-				extTree = createTree(ExtJame.backend.url.getbuddys);
+				createTree(ExtJame.backend.url.getbuddys);
 		},
 	
 		/**
