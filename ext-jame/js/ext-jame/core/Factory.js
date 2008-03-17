@@ -9,15 +9,7 @@
  * @description some helpers functions
  */
 ExtJame.factory = {
-	/**
-	 * @method getGroupsStore
-	 * @public
-	 * @description returns the roster groups as an ext.data.simplestore
-	 */
-	groupsStore : new Ext.data.SimpleStore({
-		fields: ["value", "text"],
-		data : ExtJame.roster ? ExtJame.roster.groupsArr() : []
-	}),
+
 	/**
 	 * @method statusStore
 	 * @public
@@ -33,7 +25,8 @@ ExtJame.factory = {
 				["unavailable","Unavailable"]
 			]
 	}),
-			/**
+
+	/**
 	 * @method sendMessage
 	 * @private
 	 * @descriptions sends a message to user
@@ -115,9 +108,10 @@ ExtJame.factory = {
 	 * @description creates a new SimpleDialog with a SimpleForm for adding users to the roster
 	 */
 	addBuddy : function(e){
-		if(!Ext.WindowMgr.get("AddBuddyDialog"))
+		if(!Ext.WindowMgr.get("AddBuddyDialog")){
 			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AddBuddyLayout).init();
-		else
+			Ext.WindowMgr.get("AddBuddyDialog").getComponent(0).findByType("combo")[0].store.loadData(ExtJame.roster.groupsArr());
+		}else
 			Ext.WindowMgr.get("AddBuddyDialog").show();
 	},
 
@@ -162,15 +156,46 @@ ExtJame.factory = {
 			else
 				Ext.WindowMgr.get("ClientDialog").show();
 			ExtJame.connected = true;
+			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
+			ExtJame.timer = new PeriodicalExecuter(function(pe) {
+					if (new Date().getTime() - $('jame-hud').getAttribute("lastActivity") > 60000){
+						Ext.MessageBox.show({
+					 		title:'Error Occured',
+					 		msg: 'Backend out of sync',
+					 		buttons: Ext.MessageBox.OK,
+							icon:Ext.MessageBox.ERROR,
+							fn:function(e){
+								Ext.WindowMgr.each(function(win){win.close()});
+								ExtJame.connected = false;
+								ExtJame.mgr.stopAutoRefresh();
+			    				pe.stop();
+							}
+						});
+					}
+			}, 30);
 			if(Ext.WindowMgr.get("LoginDialog"))
 				Ext.WindowMgr.get("LoginDialog").close();
 			ExtJame.backend.Connection.getNotifications();
 		}else{	// no is not connected,show the login widget
+				/*Ext.Msg.show({
+			 		title:'Error Occured',
+			 		msg: 'Could not Connect',
+			 		buttons: Ext.MessageBox.OK,
+					icon:Ext.MessageBox.ERROR
+				});*/
 			ExtJame.connected = false;
 			if(!Ext.WindowMgr.get("LoginDialog"))
 				new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.LoginLayout).init();
 			else
 				Ext.WindowMgr.get("LoginDialog").show();
+				Ext.WindowMgr.get("LoginDialog").getComponent(0).getForm.reset();
 		}
-	}
+	},
+	
+	/**
+	 * 
+	 */
+	 cutJid : function (jid){
+	 	return jid.substring(0,jid.indexOf("@"));
+	 }
 }

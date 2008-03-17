@@ -22,17 +22,12 @@ ExtJame.backend.Connection = {
 			container.id = "update-container";
 			document.body.appendChild(container);
 		}
-		container = $('update-container');
-		var upd = new Ajax.PeriodicalUpdater(container, 
-			ExtJame.backend.url.getnotifications, 
-			{method: 'get',
-			frequency: 1, 
-			decay: 1,
-			onSuccess : function(transport){	//parse the response
-				ExtJame.backend.Xml.parseNotifications(transport.responseXML.firstChild);
-			},
-			onFailure : function(){}
-		});
+		var update = function(el,ret){
+			ExtJame.backend.Xml.parseNotifications(ret.responseXML.firstChild);
+		}
+		ExtJame.mgr = new Ext.Updater("update-container");
+		ExtJame.mgr.startAutoRefresh(2, ExtJame.backend.url.getnotifications);
+		ExtJame.mgr.on("update", update);
 	},
 
 	/**
@@ -44,9 +39,11 @@ ExtJame.backend.Connection = {
 		f.ownerCt.form.submit({
 			reset:false,
 			scope: this,
+			waitMsg:"connecting...",
 			success:function(r){
-						ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
-					}
+				Ext.MessageBox.hide();
+				ExtJame.backend.Connection.loadXmlFromUrl(ExtJame.backend.url.isconnected,ExtJame.factory.loginORclient);
+			}
 		});
 	},
 
@@ -80,11 +77,15 @@ ExtJame.backend.Connection = {
 	 */
 	logout : function(){
 		var exit = function(btn){
-			Ext.Msg.getDialog().close();
+			Ext.MessageBox.hide();
 			if(btn == "yes"){
 				var parseDom = function(e){
 					if(e.getAttribute("type") == "success"){	
-						window.location.reload();
+						Ext.WindowMgr.each(function(win){win.close()});
+						Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
+						ExtJame.connected = false;
+						ExtJame.mgr.stopAutoRefresh();
+			    		ExtJame.timer.stop();
 					}else{
 						// TODO
 						window.location.reload();
@@ -218,7 +219,7 @@ ExtJame.backend.Connection = {
 		var parseDom = function(XmlEl){
 			// TODO
 		}
-		ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({newg:_new,oldg:_old,buddy:_jid}));
+		ExtJame.backend.Connection.loadXmlFromUrl(url,parseDom,$H({newg:_new,oldg:_old,name:_jid}));
 	},
 	
 	/**

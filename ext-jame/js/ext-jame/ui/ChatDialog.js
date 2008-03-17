@@ -1,4 +1,5 @@
 /**
+/**
 *	Licence	:	GPL
 *	Author	:	Robert Schönthal
 *	Date	:	16.08.2007
@@ -8,11 +9,10 @@
  * @class ExtJame.ui.ChatDialog
  * @description provides a dialog, which is able to store Chats (ChatForms) in Tabs, you can drop buddy on it for new chats
  */
-ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
+ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 
 	var extDialog = null;
 	var config = _config;
-	var id = _id;
 	var opener = _opener;
 	var dd = null;
 	var jid = _jid;
@@ -24,9 +24,8 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 	 */
 	var createDialog = function(){
 		extDialog = new Ext.Window({
-			id :id,
 			title:"ChatDialog",
-			width:520,
+			width:530,
 			height:400,
 			closable:true,
 			collapsible:true,
@@ -43,14 +42,16 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 		extDialog.getComponent(0).on("tabchange", tabChange,extDialog.getComponent(0));		
 		extDialog.setTitle(jid);
 		extDialog.on("destroy", removeChats);
-		addPanel(extDialog.getComponent(0),id,jid);
+		addPanel(extDialog.getComponent(0),jid);
 		extDialog.show(opener);
+		//panel.getComponent(1).findByType("htmleditor")[0].toggleSourceEdit(true);
 		tabpanel = extDialog.getComponent(0);
 		dd = new Ext.dd.DropTarget(tabpanel.getId(),{
 			ddGroup:"buddys",
-			parent:id,
-			notifyDrop : addPanel
+			parent:extDialog.getId(),
+			notifyDrop : pushPanel
 		});
+		extDialog.doLayout();
 	}
 	
 	/**
@@ -88,9 +89,13 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 	 *
 	 */
 	var pullResponse = function(){
- 		var myText = "["+ExtJame.myJid+"] "+this.ownerCt.form.items.items[0].getValue()+"<br/>";
+		var d = new Date();
+		var ts = d.getHours()+":"+d.getMinutes();
+ 		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+this.ownerCt.form.items.items[0].getValue()+"<br/>";
 		this.ownerCt.ownerCt.getComponent(0).body.insertHtml("beforeEnd",myText);
 		this.ownerCt.form.items.items[0].reset();
+		p = this.ownerCt.ownerCt.getComponent(0); 
+		//p.getEl().scroll("bottom",p.getEl().getY() - p.getEl().dom.scrollTop,true)
 	}
 
 	/**
@@ -98,39 +103,47 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 	 * @private
 	 * @description submits a form
 	 */
-	var submit = function(){
-		var form = this.ownerCt.form;
-		form.submit({
-			reset:false,
-			scope: this,
-			success : pullResponse
-		});
+	var submit = function(el,event,d){
+		try{
+			if(event.ENTER){
+				el.ownerCt.form.submit({
+					reset:false,
+					scope: this,
+					success : pullResponse
+				});
+			}else if(el.text){
+				el.ownerCt.form.submit({
+					reset:false,
+					scope: this,
+					success : pullResponse
+				});
+			}
+		}catch(e){
+			//TODO
+		}
 	}
 	
 	/**
-	 * @method addPanel
-	 * @private
-	 * @description adds a tab to the dialog (creates a ChatForm)
+	 * trigger a panel add from drag
 	 */
-	var addPanel = function(dd,e,data){
-		if(data.node)
+	 var pushPanel = function(dd,e,data){
 			var jid = data.node.attributes.jid;
-		else
-			var jid = data;
-		if(dd.cachedTarget){
 			tabpanel = Ext.WindowMgr.get(dd.cachedTarget.parent).getComponent(0);
-		}
-		else
-			tabpanel = dd;
-		if(!Ext.ComponentMgr.get(jid)){
-			var item = new Ext.Panel({
+			addPanel(tabpanel,jid);
+	 }
+	 
+	 /**
+	  * create new Panel
+	  */
+	  var createPanel = function(jid){
+			return new Ext.Panel({
 					id:jid,
-					title:jid,
-					parent:id,
+					title:ExtJame.factory.cutJid(jid),
+					parent:extDialog.getId(),
 					closable:true,
 					border:false,
 					layout:'border',
-					iconCls : ExtJame.roster ? ExtJame.roster.getBuddy(jid).attributes.status: '',
+					iconCls : '',
 					items:[{
 						region:'center',
 						border:0,
@@ -138,7 +151,8 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 						xtype:'panel',
 						autoScroll : true,
 						border:false,
-						layout:'fit'
+						layout:'fit',
+						bodyStyle:'padding:10px;'
 					},{
 						region:'south',
 						minHeight:150,
@@ -155,7 +169,6 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 				                fieldLabel: '',
 				                name: 'body',
 								allowBlank:false,
-								enableSourceEdit:false,
 								anchor:'0-50',
 								border:false
 				            },{
@@ -172,12 +185,26 @@ ExtJame.ui.ChatDialog = function(_id, _opener, _config, _jid){
 						}]
 					}]
 			});
-			item.on("destroy", closeTab, item);
-			tabpanel.add(item);
-			Ext.ComponentMgr.register(item);
-			tabpanel.activate(item.id);
-			tabpanel.doLayout();
+	  }
+	  
+	/**
+	 * @method addPanel
+	 * @private
+	 * @description adds a tab to the dialog (creates a ChatForm)
+	 */
+	var addPanel = function(tabpanel,jid){
+		if(!Ext.ComponentMgr.get(jid)){
+			var chatPanel = createPanel(jid);
+			chatPanel.setIconClass(ExtJame.roster.getBuddy(jid).attributes.status);
+			tabpanel.add(chatPanel);
+			Ext.ComponentMgr.register(chatPanel);
+			tabpanel.activate(chatPanel.id);
 			extDialog.doLayout();
+			//events
+			chatPanel.on("destroy", closeTab,chatPanel);
+			//chatPanel.getComponent(1).findByType("htmleditor")[0].on("specialkey",submit,item);
+			//chatPanel.getComponent(1).findByType("htmleditor")[0].toggleSourceEdit(true);
+			tabpanel.doLayout();
 		}else{
 			var pDlg = Ext.ComponentMgr.get(jid).parent;
 			Ext.WindowMgr.get(pDlg).show();

@@ -74,12 +74,35 @@ ExtJame.ui.UiConfig = {
 		closable:false,
 		plain:true,
 		border:false,
+		iconCls : "available",
 		layout:'border',
-		tbar: new Ext.Toolbar({
-			items:[{
-				text:'Roster',
-				tooltip:'manage my buddys',
+		tbar: [{
+				xtype:'tbbutton',
+				icon: 'images/jame/information.png',
+				handler:ExtJame.factory.showAbout,
+				tooltip:'About',
+				cls: 'x-btn-icon'
+			},{xtype: 'tbseparator'},{
+				text:'Profile',
+				tooltip:'my personal settings',
 				menu: {
+					id: 'ToolMenu',
+					items: [{
+						text: 'Preferences',
+						icon: 'images/jame/cog_edit.png',
+						disabled:true,
+						handler:ExtJame.factory.showPreferences
+					},{
+					 	text: 'Profile',
+						icon: 'images/jame/vcard_edit.png',
+						disabled:true,
+						handler:ExtJame.factory.showVCard
+					 }]
+				}
+			},{xtype: 'tbseparator'},{
+					text:'Roster',
+					tooltip:'manage my buddys',
+					menu: {
 					id:"BuddysMenu",
 					items:[{
 		        		text: 'Send Message',
@@ -113,31 +136,7 @@ ExtJame.ui.UiConfig = {
 						handler:ExtJame.backend.Connection.logout
 					}]
 				}
-			},{xtype: 'tbseparator'},{
-				text:'Profile',
-				tooltip:'my personal settings',
-				menu: {
-					id: 'ToolMenu',
-					items: [{
-						text: 'Preferences',
-						icon: 'images/jame/cog_edit.png',
-						disabled:true,
-						handler:ExtJame.factory.showPreferences
-					},{
-					 	text: 'Profile',
-						icon: 'images/jame/vcard_edit.png',
-						disabled:true,
-						handler:ExtJame.factory.showVCard
-					 }]
-				}
-			},{xtype: 'tbseparator'},{
-				xtype:'tbbutton',
-				icon: 'images/jame/information.png',
-				handler:ExtJame.factory.showAbout,
-				tooltip:'About',
-				cls: 'x-btn-icon',
-			}]
-		}),
+		}],
 		items:[{
 			region:'center',
 			minHeight:150,
@@ -147,10 +146,27 @@ ExtJame.ui.UiConfig = {
 		},{
 			region:'south',
 			id:'status-container',
-			height:30,
-			bodyStyle:'background:transparent;padding-top:5px;',
-			layout:'fit',
-			border:false
+			height:27,
+			bodyStyle:'background:transparent;padding:5px;',
+			border:false,
+			xtype:'form',
+			hideLabels:true,
+			method:'POST',
+			url:ExtJame.backend.url.setpresence,
+			bodyBorder:false,
+			items:[{
+				xtype:'combo',
+				store:ExtJame.factory.statusStore, 
+				displayField:'text',
+				valueField:'value',
+				typeAhead: true,
+				name:'message',
+				mode: 'local',
+				triggerAction: 'all',
+				id:'status-box',
+				emptyText:'your Status...',
+				selectOnFocus:true
+			}]
 		}]
 	},
 	AddGroupLayout : {
@@ -173,7 +189,7 @@ ExtJame.ui.UiConfig = {
 				name: 'name',
 				allowBlank:false,
 				msgTarget:'side',
-				anchor:"90%",
+				anchor:"90%"
 			}],
 			buttons :[{
 				text:"Add Group",
@@ -194,7 +210,7 @@ ExtJame.ui.UiConfig = {
 			html:'<center><h2>ext-jame</h2><p>a javascript jabber messenger</p><p>&copy; 2008 by Robert Schoenthal</p><p>caziel@digitalkaoz.net</p><p>licence: GPL</p></center>',
 			bodyStyle:'background:transparent;',
 			bodyBorder:false,
-			border:false,
+			border:false
 		}],
 		buttons:[{
 			text:"Close",
@@ -225,7 +241,9 @@ ExtJame.ui.UiConfig = {
 			},{
 				xtype:'combo',
 				fieldLabel: "Group",
-				store:ExtJame.factory.groupsStore, 
+				store:new Ext.data.SimpleStore({
+					fields: ["value", "text"]
+				}),
 				name: 'group',
 				displayField: 'value',
 				valueField : 'value',

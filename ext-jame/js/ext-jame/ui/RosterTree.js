@@ -26,7 +26,7 @@ ExtJame.ui.RosterTree = function(_parent){
 				rootVisible:false,
 				lines:false,
 				ddGroup: "buddys",
-				border:false,
+				border:false
 				
 		});
 		extTree.setRootNode(new Ext.tree.TreeNode({
@@ -43,7 +43,7 @@ ExtJame.ui.RosterTree = function(_parent){
 					addBuddyToTree(null,doc.documentElement);	//add buddys
 				}
 			}
-		}, function(){parent.add(extTree)}, extTree);
+		}, function(){parent.add(extTree); parent.doLayout();}, extTree);
 		return extTree;
 	}
 	
@@ -115,14 +115,9 @@ ExtJame.ui.RosterTree = function(_parent){
 				handler: ExtJame.backend.Connection.removeBuddy ,
 				node:_node, 
 				icon:"images/jame/user_delete.png"});
-		if(_node.attributes.subscription == "from")
-			items.push({ 	text: 'subscribed', 
-					handler: subscribedBuddy ,
-					node:_node, 
-					icon:"images/jame/group_link.png"});
-		else if(_node.attributes.subscription == "none" || _node.attributes.subscription == "to")
+		if(_node.attributes.subscription == "none" || _node.attributes.subscription == "to" || _node.attributes.subscription == "from")
 			items.push({ 	text: 'subscribe', 
-					handler: subscribeBuddy ,
+					handler: subscribedBuddy ,
 					node:_node, 
 					icon:"images/jame/group_go.png"});
 		var menu = new Ext.menu.Menu({ 
@@ -170,12 +165,10 @@ ExtJame.ui.RosterTree = function(_parent){
 		if(!anchor)
 			anchor = ExtJame.hud;
 		if(Ext.ComponentMgr.get(jid)){
-			Ext.WindowMgr.get(jid).show();
-			Ext.WindowMgr.get(jid).getComponent(0).activate(jid);
+			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).show();
+			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).getComponent(0).activate(jid);
 		}else{
-			ts = new Date().getTime();
-			uid ="mw_"+ts;
-			new ExtJame.ui.ChatDialog(uid,anchor,ExtJame.ui.UiConfig.ChatLayout,jid).init();
+			new ExtJame.ui.ChatDialog(anchor,ExtJame.ui.UiConfig.ChatLayout,jid).init();
 		}
 	}
 	
@@ -194,7 +187,7 @@ ExtJame.ui.RosterTree = function(_parent){
 			if(f){
 				var _group = new Ext.tree.TreeNode({ //group adden
 								text:f.findField("name").getValue(),
-								iconCls:"display:none;",
+								iconCls:"display:none!important;",
 								expanded:true,
 								expandable:true,
 								allowDrag:false,
@@ -209,7 +202,7 @@ ExtJame.ui.RosterTree = function(_parent){
 				for(var i=0;i<groups.length;i++){
 					var _group = new Ext.tree.TreeNode({ //group adden
 									text:groups[i],
-									iconCls:"display:none",
+									iconCls:"display:none;",
 									expanded:true,
 									expandable:true,
 									allowDrag:false,
@@ -271,13 +264,13 @@ ExtJame.ui.RosterTree = function(_parent){
 						status:"subscription pending",
 						status_text:"offline",
 						jid:f.findField("name").getValue(),
-						subscription:"unsubscribed",
+						subscription:"subscribe",
 						hide:false,
 						text:f.findField("name").getValue(),
 						icon:"images/jame/icon_invisible.png",
 						allowDrag:true,
 						allowDrop:false,
-						qtip:"JID : "+f.findField("name").getValue(),
+						qtip:"JID : "+f.findField("name").getValue()
 					});
 					_buddy.on("contextmenu",buddyContext,this);
 					_buddy.on("dblclick",initChat,this);
@@ -422,7 +415,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		},
 	
 		/**
-		 * @method getStore
+		 * @method groupsArr
 		 * @public
 		 * @description returns the groups array for an Ext.data.SimpleStore
 		 */
@@ -443,12 +436,10 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description updates a buddy node
 		 */
 		updateBuddy : function(buddy,_attrs){
-			if(_attrs["subscription"] == "unavailable")
-				_attrs["status"] = "unavailable";
 			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png",
 			buddy.attributes.status = _attrs['status'];
 			buddy.attributes.subscription = _attrs['subscription'];
-			var qtip = "JID : "+_attrs["from"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
+			var qtip = "JID : "+_attrs["jid"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
 			if(buddy.getUI().textNode.setAttributeNS){
 				buddy.getUI().textNode.setAttributeNS("ext", "qtip", qtip);
 			}else{

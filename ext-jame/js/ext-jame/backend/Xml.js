@@ -130,37 +130,63 @@ ExtJame.backend.Xml = {
 	 */
 	parseNotifications : function(XmlEl){
 		if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "success"){ //incoming notification
+			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
 			var response = XmlEl.getElementsByTagName("methodResponse")[0];
 			var messages = ExtJame.backend.Xml.getMessagesFromResponse(response);
 			var buddys = ExtJame.backend.Xml.getBuddysFromResponse(response);
 
 			if(messages.length > 0){	// messages were found so create a chat or appends the message
-				for(var i=0;i<messages.length;i++){
-					if(Ext.ComponentMgr.get(messages[i]["from"])){ // chat exists
-						var pDlg = Ext.ComponentMgr.get(messages[i]["from"]).parent;
-						Ext.WindowMgr.get(pDlg).show();
-						Ext.WindowMgr.get(pDlg).getComponent(0).activate(messages[i]["from"]);
-				 		var myText = "["+messages[i]["from"]+"] "+messages[i]["msg"]+"<br/>";
-						var panel = Ext.ComponentMgr.get(messages[i]["from"]).getComponent(0);
-						panel.body.insertHtml("beforeEnd",myText);
-					}else{ // chat doesnt exists
-						ts = new Date().getTime();
-						uid ="mw_"+ts;
-						new ExtJame.ui.ChatDialog(uid,"jame-hud",ExtJame.ui.UiConfig.ChatLayout,messages[i]["from"]).init();
-						var panel = Ext.ComponentMgr.get(messages[i]["from"]).getComponent(0);
-				 		var myText = "["+messages[i]["from"]+"] "+messages[i]["msg"]+"<br/>";
-						panel.body.insertHtml("beforeEnd",myText);
-					}
-				}
+				ExtJame.backend.Xml.updateMessages(messages);
 			}
 			if(buddys.length > 0){		// buddys were found the modify details or append the buddy to the tree
+				ExtJame.backend.Xml.updateBuddys(buddys);
+			}
+		}else{ //disconnected or something like that
+			//ExtJame.backend.Connection.isConnected();
+		}
+	},
+	
+	/**
+	 * @method updateMessages
+	 */
+	 updateMessages : function (messages){
+			for(var i=0;i<messages.length;i++){
+				if(Ext.ComponentMgr.get(messages[i]["from"])){ // chat exists
+					var pDlg = Ext.ComponentMgr.get(messages[i]["from"]).parent;
+					Ext.WindowMgr.get(pDlg).show();
+					Ext.WindowMgr.get(pDlg).getComponent(0).activate(messages[i]["from"]);
+				}else{ // chat doesnt exists
+					new ExtJame.ui.ChatDialog(ExtJame.hud,ExtJame.ui.UiConfig.ChatLayout,messages[i]["from"]).init();
+				}
+				var panel = Ext.ComponentMgr.get(messages[i]["from"]).getComponent(0);
+				var d = new Date();
+				var ts = d.getHours()+":"+d.getMinutes();
+		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"] </b>"+messages[i]["msg"]+"<br/>";
+				panel.body.insertHtml("beforeEnd",btext);
+				panel.getEl().scroll("bottom",1000,true);
+			}
+	 },
+	
+	/**
+	 * @method updateBuddys
+	 */
+	 updateBuddys : function(buddys){
 				for(var i=0;i<buddys.length;i++){
 					if(buddys[i]["status"] == "subscribe"){	//ask for subscription request
 						var buddy = buddys[i];
 						var addem = function(btn){
 							if(btn == "yes"){
+								var node = ExtJame.roster.getBuddy(buddy["jid"]);
+								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribe");
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribed");
+								if(node){
+									if(Ext.ComponentMgr.get(buddy["jid"])){
+											ExtJame.roster.updateBuddy(node,buddy);
+									}else
+										ExtJame.roster.addBuddys(null,XmlEl);
+								}
 							}else{
+								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"unsubscribe");
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"unsubscribed");
 							}
 						}
@@ -171,24 +197,21 @@ ExtJame.backend.Xml = {
 							icon:Ext.MessageBox.QUESTION,
 							fn: addem
 						});
-					}else{
+					}else{ // presence updates
 						var buddy = ExtJame.roster.getBuddy(buddys[i]["jid"]);
 						if(buddy){
 							ExtJame.roster.updateBuddy(buddy,buddys[i]);
 							if(Ext.ComponentMgr.get(buddys[i]["jid"])){
-									var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
-									var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
-									tabSpan.removeClass(oldIconClass);
-									Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
-									tabSpan.addClass(buddys[i]["status"]);
+								var oldIconClass = Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls;
+								var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddys[i]["jid"]).ownerCt.getTabEl(Ext.ComponentMgr.get(buddys[i]["jid"]))).child('span.x-tab-strip-text');
+								tabSpan.removeClass(oldIconClass);
+								Ext.ComponentMgr.get(buddys[i]["jid"]).iconCls = buddys[i]["status"];
+								tabSpan.addClass(buddys[i]["status"]);
 							}
 						}else{
-							ExtJame.roster.addBuddys(null,XmlEl);
+							//ExtJame.roster.addBuddys(null,XmlEl);
 						}
 					}
 				}
-			}
-		}
-	}
-	
+	 }
 }
