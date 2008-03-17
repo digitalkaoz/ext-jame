@@ -33,8 +33,12 @@ var ExtJame = {
 		else{
 			if(Ext.WindowMgr.getActive())
 				Ext.WindowMgr.hideAll();
-			else
-				Ext.WindowMgr.each(function(win){win.show();})
+			else{
+				Ext.WindowMgr.each(function(win){
+					if(!win.initialConfig.modal)
+						win.show();
+				})
+			}
 		}
 	}
 }
@@ -43,6 +47,7 @@ var ExtJame = {
  * binds the application to the hud element (id)
  */
 Ext.onReady(function(){
+	$("jame-container").innerHTML= '<input type="button" id="jame-hud" value="start Client" />';
     ExtJame.hud = Ext.get('jame-hud');
     if(ExtJame.hud)
     	ExtJame.hud.on('click', ExtJame.init);

@@ -49,11 +49,14 @@ class AdapterController {
 				params.newuser = true;
 			else
 				params.newuser = false;
-			def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
-			if(ret == true)
-				fnResult = "success"
-			else{
-				session.adapter.smack = null;
+			try{
+				def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
+				if(ret == true)
+					fnResult = "success"
+				else
+					session.adapter.smack = null;
+			}catch(e){
+				errors = e.getMessage()
 			}
 			session.adapter.name = params.name
 			session.adapter.port = params.port.toInteger()
@@ -63,13 +66,16 @@ class AdapterController {
 				fnResult = "success"
 				params = {name:session.adapter.name;port:session.adapter.port;server:session.adapter.server}
 			}else{
-				if(params.newuser)
-					params.newuser = true;
-				else
-					params.newuser = false;
-				def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
-				if(ret == true)
+				try{
+					render session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
+					def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
+					if(ret == true)
 						fnResult = "success"
+					else
+						session.adapter.smack = null;
+				}catch(e){
+					errors = e.getMessage()
+				}
 				session.adapter.name = params.name
 				session.adapter.port = params.port.toInteger()
 				session.adapter.server = params.server
@@ -112,16 +118,11 @@ class AdapterController {
 		def fnResult = "error"
 		def errors = null
 		def userinfo = ["name":"","server":"","port":""]
-		if(session.adapter && session.adapter.smack){
-			try{
-				def ret = session.adapter.smack.isConnected()
-				if(ret){
-					fnResult="success"
-					params = {name:session.adapter.name;port:session.adapter.port;server:session.adapter.server}
-				}
-			}catch(Exception e){
-				errors = e.getMessage()
-			}
+		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
+			fnResult="success"
+			params["name"] = session.adapter.name
+			params["port"] = session.adapter.port
+			params["server"] = session.adapter.server
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"

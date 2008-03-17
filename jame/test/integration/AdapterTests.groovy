@@ -1,6 +1,6 @@
 class AdapterTests extends GroovyTestCase {
 
-    void testSomething() {
-
-    }
+	void testSomething() {
+		
+	}
 }
