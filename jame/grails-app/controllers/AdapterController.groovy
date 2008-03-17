@@ -14,7 +14,7 @@ class AdapterController {
 	* @description returns messages and presences
 	*/
 	def notifications = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		def messages = null
 		def presences = null
@@ -24,18 +24,13 @@ class AdapterController {
 				presences = session.adapter.smack.getPresences()
 				fnResult = "success"
 			}catch(Exception e){
-				fnResult = "error"
 				errors = e.getMessage()
 			}
 		}else{
 			session.adapter = new Adapter()
+			errors = "You are not connected"
 		}
-		if(!testMode)
-			render(contentType:"text/xml") {
-				render session.adapter.response("Adapter.notifications",fnResult,["error":errors,	"messages":messages,	"presences":presences]) 
-			}
-		else
-			return session.adapter.response("Adapter.notifications",fnResult,["error":errors,	"messages":messages,	"presences":presences])
+		XmlOut(session.adapter.response("Adapter.notifications",fnResult,["error":errors,	"messages":messages,	"presences":presences]))
 	}
 	
 	/**
@@ -45,82 +40,42 @@ class AdapterController {
 	* @description trys to log in the user with the specified parameters
 	*/
 	def login = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
-		if(!session.adapter){
+		if(!session.adapter || !session.adapter.smack){	//session doesnt exists
 			session.adapter = new Adapter()
 			session.adapter.init()
-			try{
+			if(params.newuser)
+				params.newuser = true;
+			else
+				params.newuser = false;
+			def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
+			if(ret == true)
+				fnResult = "success"
+			else{
+				session.adapter.smack = null;
+			}
+			session.adapter.name = params.name
+			session.adapter.port = params.port.toInteger()
+			session.adapter.server = params.server
+		}else{	//session exists, check if still connected
+			if(session.adapter.smack.isConnected()){	// yes is still connected
+				fnResult = "success"
+				params = {name:session.adapter.name;port:session.adapter.port;server:session.adapter.server}
+			}else{
 				if(params.newuser)
 					params.newuser = true;
 				else
 					params.newuser = false;
 				def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
-				if(ret){
-					fnResult = "success"
-					session.adapter.name = params.name
-					session.adapter.port = params.port.toInteger()
-					session.adapter.server = params.server
-				}else{
-					errors = "could not connected to specified server,please check your input"
-					fnResult = "error"
-				}
-			}catch(Exception e){
-				fnResult = "error"
-				errors = e.getMessage()
-			}
-		}else{
-			if(session.adapter.smack){
-				if(session.adapter.smack.isConnected()){
-					fnResult = "success"
-				}else{
-					try{
-						if(params.newuser)
-							params.newuser = true;
-						else
-							params.newuser = false;
-						def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
-						if(ret){
-							fnResult = "success"
-							session.adapter.name = params.name
-							session.adapter.port = params.port.toInteger()
-							session.adapter.server = params.server
-						}else{
-							errors = "could not connected to specified server,please check your input"
-							fnResult = "error"
-						}
-					}catch(Exception e){
-						fnResult = "error"
-						errors = e.getMessage()
-					}
-				}
-			}else{
-				session.adapter.init()
-				try{
-					if(params.newuser)
-						params.newuser = true;
-					else
-						params.newuser = false;
-					def ret = session.adapter.smack.connect(params.name,params.password,params.server,params.port.toInteger(), "Jame",params.newuser)
-					if(ret){
+				if(ret == true)
 						fnResult = "success"
-						session.adapter.name = params.name
-						session.adapter.port = params.port.toInteger()
-						session.adapter.server = params.server
-					}else{
-						errors = "could not connected to specified server,please check your input"
-						fnResult = "error"
-					}
-				}catch(Exception e){
-					fnResult = "error"
-					errors = e.getMessage()
-				}
+				session.adapter.name = params.name
+				session.adapter.port = params.port.toInteger()
+				session.adapter.server = params.server
 			}
 		}
-		if(!testMode)
-    		render(contentType:"text/xml") {render session.adapter.response("Adapter.login",fnResult,["user":params,"error":errors])}
-		else
-			return session.adapter.response("Adapter.login",fnResult,["user":params,"error":errors])
+		XmlOut(session.adapter.response("Adapter.login",fnResult,["user":params,"error":errors]))
 	}
 	
 	/**
@@ -130,26 +85,21 @@ class AdapterController {
 	* @description trys to log out the user
 	*/
 	def logout =  {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
 				session.adapter.smack.disconnect()
+				session.adapter.smack = null
 			    fnResult = "success"
 			}catch(Exception e){
-				fnResult = "error"
 				errors = e.getMessage()
 			}
-		    session.clear()
 		}else{
 			session.adapter = new Adapter()
-			fnResult = "error"
-			errors = "not logged in"
+			errors = "You are not connected"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.logout",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.logout",fnResult,["error":errors])
+		XmlOut(session.adapter.response("Adapter.logout",fnResult,["error":errors]))
 	}
 	
 	/**
@@ -159,7 +109,7 @@ class AdapterController {
 	* @description checks if the user is already connection
 	*/
 	def isconnected = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		def userinfo = ["name":"","server":"","port":""]
 		if(session.adapter && session.adapter.smack){
@@ -167,26 +117,16 @@ class AdapterController {
 				def ret = session.adapter.smack.isConnected()
 				if(ret){
 					fnResult="success"
-					userinfo["name"] = session.adapter.name
-					userinfo["server"] = session.adapter.server
-					userinfo["port"] = session.adapter.port
-				}else{
-					errors = "You are not connected"
-					fnResult="error"
+					params = {name:session.adapter.name;port:session.adapter.port;server:session.adapter.server}
 				}
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-    		render(contentType:"text/xml") {render session.adapter.response("Adapter.isconnected",fnResult,["error":errors,"user":userinfo]) }
-		else
-			return session.adapter.response("Adapter.isconnected",fnResult,["error":errors,"user":userinfo])
+		XmlOut(session.adapter.response("Adapter.isconnected",fnResult,["error":errors,"user":params]))
 	}
 	
 	/**
@@ -196,7 +136,7 @@ class AdapterController {
 	* @description returns the roster buddys and groups
 	*/
 	def getbuddys = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		def buddys =  null
 		def groups = null
@@ -207,17 +147,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.getBuddys",fnResult,["error":errors,"buddys":buddys,"groups":groups]) }
-		else
-			return session.adapter.response("Adapter.getBuddys",fnResult,["error":errors,"buddys":buddys,"groups":groups])
+		XmlOut(session.adapter.response("Adapter.getBuddys",fnResult,["error":errors,"buddys":buddys,"groups":groups]))
 	}
 	
 	/**
@@ -227,7 +162,7 @@ class AdapterController {
 	* @description sets the users presence to a state. read Presences in the Smack Docu for more information
 	*/
 	def sendpresence = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -235,17 +170,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.sendpresence",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.sendpresence",fnResult,["error":errors])
+		XmlOut(session.adapter.response("Adapter.sendpresence",fnResult,["error":errors]))
 	}
 	
 	/**
@@ -255,7 +185,7 @@ class AdapterController {
 	* @description sends a message to the specified user
 	*/
 	def sendmessage = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -263,17 +193,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.sendmessage",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.sendmessage",fnResult,["error":errors]) 
+	    XmlOut(session.adapter.response("Adapter.sendmessage",fnResult,["error":errors]))
 	}
 	
 	/**
@@ -283,7 +208,7 @@ class AdapterController {
 	* @description adds a user to roster and move em into the right group
 	*/
 	def addbuddy = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -291,17 +216,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.addBuddy",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.addBuddy",fnResult,["error":errors]) 
+    	XmlOut(session.adapter.response("Adapter.addBuddy",fnResult,["error":errors]))
 	}
 	
 	/**
@@ -311,7 +231,7 @@ class AdapterController {
 	* @description adds a group to the roster
 	*/
 	def addgroup = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -319,17 +239,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.addGroup",fnResult,["error":errors])}
-		else
-			return session.adapter.response("Adapter.addGroup",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.addGroup",fnResult,["error":errors]))
 	}
 
 	/**
@@ -339,7 +254,7 @@ class AdapterController {
 	* @description deletes a buddy from the roster
 	*/
 	def deletebuddy = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -347,17 +262,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.deletebuddy",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.deletebuddy",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.deletebuddy",fnResult,["error":errors]))
 	}
 
 	/**
@@ -367,7 +277,7 @@ class AdapterController {
 	* @description renames a buddy
 	*/
 	def renamebuddy = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -375,17 +285,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.renamebuddy",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.renamebuddy",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.renamebuddy",fnResult,["error":errors]))
 	}
 
 	/**
@@ -395,7 +300,7 @@ class AdapterController {
 	* @description moves a buddy from one group into an other
 	*/
 	def switchusergroup = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -403,17 +308,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.switchUserGroup",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.switchUserGroup",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.switchUserGroup",fnResult,["error":errors]))
 	}
 
 	/**
@@ -423,7 +323,7 @@ class AdapterController {
 	* @description sends a subscribtion to a user, read subscribtion handling in the smack docu for more details
 	*/
 	def subscribe = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -431,17 +331,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.subscribe",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.subscribe",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.subscribe",fnResult,["error":errors]))
 	}
 
 	/**
@@ -451,7 +346,7 @@ class AdapterController {
 	* @description renames a roster group
 	*/
 	def renamegroup = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
 			try{
@@ -459,17 +354,12 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
-		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.renamegroup",fnResult,["error":errors]) }
-		else
-			return session.adapter.response("Adapter.renamegroup",fnResult,["error":errors])
+    	XmlOut(session.adapter.response("Adapter.renamegroup",fnResult,["error":errors]))
 	}
 
 	/**
@@ -479,7 +369,7 @@ class AdapterController {
 	* @description deletes a group from the roster
 	*/
 	def deletegroup = {
-		def fnResult = null
+		def fnResult = "error"
 		def errors = null
 		def group = null
 		if(session.adapter && session.adapter.smack && session.adapter.smack.isConnected()){
@@ -488,16 +378,18 @@ class AdapterController {
 				fnResult="success"
 			}catch(Exception e){
 				errors = e.getMessage()
-				fnResult="error"
 			}
 		}else{
 			session.adapter = new Adapter()
 			errors = "You are not connected"
-			fnResult="error"
 		}
+    	XmlOut(session.adapter.response("Adapter.deletegroup",fnResult,["group":group,"error":errors]))
+	}
+	
+	private void XmlOut(xmlString){
 		if(!testMode)
-	    	render(contentType:"text/xml") {render session.adapter.response("Adapter.deletegroup",fnResult,["group":group,"error":errors]) }
+	    	render(contentType:"text/xml",text:xmlString)
 		else
-			return session.adapter.response("Adapter.deletegroup",fnResult,["group":group,"error":errors])
+			render xmlString
 	}
 }

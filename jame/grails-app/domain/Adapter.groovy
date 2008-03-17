@@ -25,7 +25,7 @@ class Adapter {
     	}
     	return smack
     }
-
+    
 	/**
 	* @method response
 	* @public
