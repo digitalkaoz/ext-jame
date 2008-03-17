@@ -327,6 +327,25 @@ public class JameConnection implements PacketListener, RosterListener {
 			this.messageList.add(new JameMessage(m.getBody(), m.getSubject(), m
 			        .getFrom(), m.getTo()));
 		}
+		if (packet.getClass() == Presence.class) {
+			Presence p = (Presence) packet;
+			if (p.getType() == Presence.Type.subscribe) {
+				String jid = p.getFrom();
+				if (jid.indexOf("/") > 0) // ignore ressources for this
+											// version
+					jid = jid.substring(0, jid.indexOf("/"));
+				JamePresence jp = new JamePresence();
+				jp.setJid(jid);
+				if (p.getType() != null)
+					jp.setStatus(p.getType().toString());
+				if (p.getMode() != null)
+					jp.setStatus(p.getMode().toString());
+				jp.setText(p.toString());
+				jp.setType(p.getType().toString());
+				System.out.println(jp.toString());
+				this.presenceList.add(jp);
+			}
+		}
 	}
 
 	/**
@@ -348,6 +367,7 @@ public class JameConnection implements PacketListener, RosterListener {
 			        .toString());
 		jp.setText(p.toString());
 		jp.setType(p.getType().toString());
+		System.out.println(jp.toString());
 		this.presenceList.add(jp);
 	}
 

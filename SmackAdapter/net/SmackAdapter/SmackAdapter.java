@@ -7,6 +7,7 @@ package net.SmackAdapter;
 
 // imports
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @class net.SmackAdapter.SmackAdapter
@@ -15,6 +16,8 @@ import java.util.Collection;
 public class SmackAdapter {
 
 	private JameConnection	jconn	= null; // private Attribute
+
+	private Timer	       timer	= null;
 
 	/**
 	 * adds the specified buddy to the specified group
@@ -79,6 +82,12 @@ public class SmackAdapter {
 	 * @return boolean
 	 */
 	public boolean isConnected() {
+		if (timer == null) {
+			timer = new Timer(this, new Date().getTime());
+			timer.start();
+		} else {
+			timer.lastActivity = new Date().getTime();
+		}
 		if (jconn != null)
 			return jconn.isConnected();
 		else
@@ -165,6 +174,11 @@ public class SmackAdapter {
 	public boolean disconnect() throws Exception {
 		if (jconn.isConnected()) {
 			jconn.disconnect();
+			jconn = null;
+			if (timer != null) {
+				timer.interrupt();
+				timer = null;
+			}
 			return true;
 		} else
 			return true;
@@ -361,5 +375,31 @@ public class SmackAdapter {
 			return jconn.renameRosterEntry(rosterEntryName, newName);
 		} else
 			return false;
+	}
+}
+
+class Timer extends Thread {
+	long	     lastActivity;
+
+	SmackAdapter	caller	= null;
+
+	long	     now;
+
+	public Timer(SmackAdapter adp, long _now) {
+		caller = adp;
+		lastActivity = _now;
+	}
+
+	// adds numbers from 1 to limit
+	@Override
+	public void run() {
+		while (now - lastActivity < 60000) { // timeout one minute
+			// still running
+			now = new Date().getTime();
+		}
+		try {
+			caller.disconnect();
+		} catch (Exception e) {
+		}
 	}
 }
