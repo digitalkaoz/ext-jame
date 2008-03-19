@@ -310,6 +310,7 @@ public class JameConnection implements PacketListener, RosterListener {
 			t.setTo(p.getJid());
 			t.setFrom(this.conn.getUser());
 			this.conn.sendPacket(t);
+			addRosterEntry(p.getJid(), "");
 		}
 		return true;
 	}
@@ -329,10 +330,33 @@ public class JameConnection implements PacketListener, RosterListener {
 		}
 		if (packet.getClass() == Presence.class) {
 			Presence p = (Presence) packet;
-			if (p.getType() == Presence.Type.subscribe) {
+			if (p.getType() == Presence.Type.subscribe
+			        || p.getType() == Presence.Type.subscribed) {
 				String jid = p.getFrom();
 				if (jid.indexOf("/") > 0) // ignore ressources for this
-											// version
+					// version
+					jid = jid.substring(0, jid.indexOf("/"));
+				JamePresence jp = new JamePresence();
+				jp.setJid(jid);
+				if (p.getType() != null)
+					jp.setStatus(p.getType().toString());
+				if (this.conn.getRoster().getPresence(jid).getMode() != null)
+					jp.setStatus(this.conn.getRoster().getPresence(jid)
+					        .getMode().toString());
+				jp.setText(p.toString());
+				jp.setType(p.getType().toString());
+				this.presenceList.add(jp);
+			}
+			if (p.getType() == Presence.Type.unsubscribe
+			        || p.getType() == Presence.Type.unsubscribed) {
+				try {
+					delRosterEntry(p.getFrom());
+				} catch (Exception e) {
+
+				}
+				String jid = p.getFrom();
+				if (jid.indexOf("/") > 0) // ignore ressources for this
+					// version
 					jid = jid.substring(0, jid.indexOf("/"));
 				JamePresence jp = new JamePresence();
 				jp.setJid(jid);
@@ -342,7 +366,6 @@ public class JameConnection implements PacketListener, RosterListener {
 					jp.setStatus(p.getMode().toString());
 				jp.setText(p.toString());
 				jp.setType(p.getType().toString());
-				System.out.println(jp.toString());
 				this.presenceList.add(jp);
 			}
 		}
@@ -367,7 +390,6 @@ public class JameConnection implements PacketListener, RosterListener {
 			        .toString());
 		jp.setText(p.toString());
 		jp.setType(p.getType().toString());
-		System.out.println(jp.toString());
 		this.presenceList.add(jp);
 	}
 
@@ -400,6 +422,13 @@ public class JameConnection implements PacketListener, RosterListener {
 	 */
 	@SuppressWarnings("unchecked")
 	public void entriesAdded(Collection addresses) {
+		/*
+		 * for (Iterator it = addresses.iterator(); it.hasNext();) { String
+		 * address = (String) it.next(); RosterEntry entry =
+		 * this.conn.getRoster().getEntry(address); if (entry != null) {
+		 * Presence response = new Presence(Presence.Type.unsubscribed);
+		 * response.setTo(entry.getUser()); this.conn.sendPacket(response); } }
+		 */
 	}
 
 	/**
@@ -408,31 +437,33 @@ public class JameConnection implements PacketListener, RosterListener {
 	 * @return JameContact[]
 	 * @throws Exception
 	 */
-	public JameContact[] getRoster() throws Exception {
+	@SuppressWarnings("unchecked")
+	public LinkedList getRoster() throws Exception {
 		Roster sr = this.conn.getRoster();
-		JameContact[] roster = new JameContact[sr.getEntryCount()];
-		int cont = -1;
+		LinkedList buddyList = new LinkedList();
 		for (RosterEntry re : sr.getEntries()) {
-			cont++;
-			JameContact jc = new JameContact();
-			jc.setJabberID(re.getUser().toString());
-			jc.setName(re.getName().toString());
+			try {
+				JameContact jc = new JameContact();
+				jc.setJabberID(re.getUser().toString());
+				jc.setName(re.getName().toString());
+				jc.setGroups(re.getGroups());
+				jc.setPresenceType(re.getType().toString());
+				if (sr.getPresence(re.getUser()).getType() != null)
+					jc.setPresenceMode(sr.getPresence(re.getUser()).getType()
+					        .toString());
+				if (sr.getPresence(re.getUser()).getMode() != null)
+					jc.setPresenceMode(sr.getPresence(re.getUser()).getMode()
+					        .toString());
+				if (sr.getPresence(re.getUser()).getStatus() != null)
+					jc.setPresenceMessage(sr.getPresence(re.getUser())
+					        .getStatus().toString());
 
-			jc.setGroups(re.getGroups());
-			jc.setPresenceType(re.getType().toString());
-			if (sr.getPresence(re.getUser()).getType() != null)
-				jc.setPresenceMode(sr.getPresence(re.getUser()).getType()
-				        .toString());
-			if (sr.getPresence(re.getUser()).getMode() != null)
-				jc.setPresenceMode(sr.getPresence(re.getUser()).getMode()
-				        .toString());
-			if (sr.getPresence(re.getUser()).getStatus() != null)
-				jc.setPresenceMessage(sr.getPresence(re.getUser()).getStatus()
-				        .toString());
-
-			roster[cont] = jc;
+				buddyList.add(jc);
+			} catch (Exception e) {
+				// System.out.println(e.getStackTrace().toString());
+			}
 		}
-		return roster;
+		return buddyList;
 	}
 
 	/**

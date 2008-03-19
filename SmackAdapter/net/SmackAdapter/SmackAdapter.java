@@ -229,9 +229,14 @@ public class SmackAdapter {
 	 * @return JameContact[]
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public JameContact[] getRoster() throws Exception {
 		if (jconn.isConnected()) {
-			return jconn.getRoster();
+			JameContact[] jc = new JameContact[jconn.getRoster().size()];
+			for (int i = 0; i < jconn.getRoster().size(); i++) {
+				jc[i] = (JameContact) jconn.getRoster().get(i);
+			}
+			return jc;
 		} else
 			return null;
 	}
