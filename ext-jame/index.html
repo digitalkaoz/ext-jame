@@ -1,5 +1,68 @@
 <html>
 	<head>
+		<link rel="stylesheet" type="text/css" href="js/ext2/resources/css/ext-all.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/jame.css" />
+	</head>
+	<body>
+		<body>
+		  <div id="page_margins">
+			<div id="page">
+				<div id="header">
+					<a id="logo"><img src="images/jame/logo.png"/></a>
+						<div id="jame-container">
+				 			<img src="images/jame/jabnim.gif"/>
+				 		</div>
+			      </div>
+			      <div id="main">
+					<div id="col1">
+					  <div id="col1_content" class="clearfix">
+					    <ul id="navi">
+					      <li><a href="http://ext-jame.svn.sourceforge.net/viewvc/ext-jame/trunk/ext-jame/" target="blank">ext-jame Sources</a></li>
+					      <li><a href="http://ext-jame.svn.sourceforge.net/viewvc/ext-jame/trunk/SmackAdapter/" target="blank">SmackAdapter Sources</a></li>
+					      <li><a href="http://ext-jame.svn.sourceforge.net/viewvc/ext-jame/trunk/jame/" target="blank">GrailsAdapter Sources</a></li>
+					      <li>-----------------------------</li>
+					      <li><a href="http://extjs.com/deploy/dev/docs/" target="blank">ExtJs Doc</a></li>
+					      <li><a href="http://www.prototypejs.org/api" target="blank">PrototypeJs Doc</a></li>
+					      <li><a href="http://www.igniterealtime.org/builds/smack/docs/latest/javadoc/" target="blank">Smack Doc</a></li>
+					      <li><a href="http://groovy.codehaus.org/Documentation" target="blank">Groovy Doc</a></li>
+					      <li><a href="http://grails.codehaus.org/Documentation" target="blank">Grails Doc</a></li>
+					      <li><a href="http://www.igniterealtime.org/projects/openfire/documentation.jsp" target="blank">OpenFire Doc</a></li>
+					    </ul>
+					  </div>
+					</div>
+					<div id="col3">
+					  <div id="col3_content" class="clearfix">
+					  	<h3>Free and Open Source Javascript Jabber Messenger</h3>
+					  	<ul>
+					  		<li>Desktop Behavior</li>
+					  		<li>CrossBrowser abilities</li>
+					  		<li>full RosterManagment</li>
+					  		<li>Basic Chat Functionality</li>
+					  		<li>Tabbed Chats</li>
+					  		<li>Drag n Drop Functions</li>
+					  	</ul>
+					  	
+					  	<h3 style="color:red">Development Version Without Backend</h3>
+				 		<p>try the following buttons for viewing the different dialogs, <b>note: everything which needs to contact the backend wont work, but provided some example buddys</b></p>
+				 		<ul>
+				 			<input type="button" onclick="if(!Ext.WindowMgr.get('LoginDialog'))new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.LoginLayout).init();" value="Login Dialog"/>
+				 			<input type="button" onclick="showClient();" value="Client Dialog"/>
+				 			<input type="button" onclick="if(!Ext.ComponentMgr.get('tester@testserver.com'))new ExtJame.ui.ChatDialog('jame-hud',ExtJame.ui.UiConfig.ChatLayout,'tester@testserver.com').init();" value="Chat Dialog"/>
+				 		</ul>
+					  	
+					  </div>
+					  <div id="ie_clearing">
+					    &nbsp;
+					  </div>
+					</div>
+					</div>
+			      <div id="footer">
+			    			<p>&copy; 2007 by Robert Sch&ouml;nthal</p>
+			      </div>
+			</div>
+		</div>
+	</body>
+	
 		<script id="script_prototype" src="js/prototype/prototype160.js" type="text/javascript"></script>
 		<script id="script_yui-utilities" src="js/ext2/adapter/yui/yui-utilities.js" type="text/javascript"></script>
 		<script id="script_ext-yui-adapter" src="js/ext2/adapter/yui/ext-yui-adapter.js" type="text/javascript"></script>
@@ -16,14 +79,23 @@
 		<script id="script_ChatDialog" src="js/ext-jame/ui/ChatDialog.js" type="text/javascript"></script>
 		<script id="script_UiConfig" src="js/ext-jame/ui/Config.js" type="text/javascript"></script>
 		<script id="script_Xml" src="js/ext-jame/backend/Xml.js" type="text/javascript"></script>
+		
+		<script type="text/javascript">
+		showClient = function(){
+			if(!Ext.WindowMgr.get('ClientDialog')){
+				new ExtJame.ui.ClientDialog(ExtJame.hud,ExtJame.ui.UiConfig.ClientLayout).init();
+				window.testData = new DOMParser().parseFromString(
+						"<?xml version='1.0' encoding='utf-8'?><response type='success'><methodCall>Adapter.getBuddys</methodCall><methodResponse><buddys><buddy jid='digitalkaoz@jabber.har.fh-stralsund.de'><name>digitalkaoz</name><status type='available' subscription='both'></status><group>Flanders</group></buddy><buddy jid='tester@jabber.har.fh-stralsund.de'><name>tester</name><status type='unavailable' subscription='both'></status><group>Nelson</group></buddy><buddy jid='tester2@jabber.har.fh-stralsund.de'><name>tester2</name><status type='xa' subscription='both'></status><group>Homer</group></buddy><buddy jid='tester3@jabber.har.fh-stralsund.de'><name>tester3</name><status type='away' subscription='both'></status><group>Flanders</group></buddy><buddy jid='tester4@jabber.har.fh-stralsund.de'><name>tester4</name><status type='dnd' subscription='both'></status><group>Flanders</group></buddy><buddy jid='tester5@jabber.har.fh-stralsund.de'><name>tester5</name><status type='dnd' subscription='both'></status><group>Flanders</group></buddy></buddys><groups><group>Flanders</group><group>Nelson</group><group>Homer</group></groups></methodResponse></response>",
+						'application/xml'); 
+					ExtJame.roster.addGroups(null,window.testData.documentElement);
+					ExtJame.roster.addBuddys(null,window.testData.documentElement);
+					Ext.WindowMgr.get("ClientDialog").doLayout();
+			}
+		}
+		</script>
 <!-- -->
 <!-- minified version --		
 		<script id="script_ExtJame-all" src="js/ext-jame/ExtJame-all.js" type="text/javascript"></script>
 <!-- -->
-	</head>
-	<body>
-		<div id="jame-container">
- 			<img src="images/jame/spinner.gif"/>
- 		</div>
-	</body>
+	</body>	
 </html>
