@@ -154,7 +154,6 @@ ExtJame.backend.Xml = {
 				if(Ext.ComponentMgr.get(messages[i]["from"])){ // chat exists
 					var pDlg = Ext.ComponentMgr.get(messages[i]["from"]).parent;
 					Ext.WindowMgr.get(pDlg).show();
-					Ext.WindowMgr.get(pDlg).getComponent(0).activate(messages[i]["from"]);
 				}else{ // chat doesnt exists
 					new ExtJame.ui.ChatDialog(ExtJame.hud,ExtJame.ui.UiConfig.ChatLayout,messages[i]["from"]).init();
 				}
@@ -163,7 +162,14 @@ ExtJame.backend.Xml = {
 				var ts = d.getHours()+":"+d.getMinutes();
 		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"] </b>"+messages[i]["msg"]+"<br/>";
 				panel.body.insertHtml("beforeEnd",btext);
-				panel.getEl().scroll("bottom",1000,true);
+				panel.body.scroll('b',panel.body.dom.offsetHeight,false);
+				if(Ext.ComponentMgr.get(messages[i]["from"]) && Ext.ComponentMgr.get(messages[i]["from"]) != Ext.ComponentMgr.get(messages[i]["from"]).ownerCt.getActiveTab()){
+					var oldIconClass = Ext.ComponentMgr.get(messages[i]["from"]).iconCls;
+					var tabSpan = Ext.fly(Ext.ComponentMgr.get(messages[i]["from"]).ownerCt.getTabEl(Ext.ComponentMgr.get(messages[i]["from"]))).child('span.x-tab-strip-text');
+					tabSpan.removeClass(oldIconClass);
+					Ext.ComponentMgr.get(messages[i]["from"]).iconCls = "message";
+					tabSpan.addClass("message");
+				}
 			}
 	 },
 	

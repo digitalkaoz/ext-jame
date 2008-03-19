@@ -132,15 +132,14 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	 */
 	var tabChange = function(e){
 		extDialog.setTitle(e.getActiveTab().title);
-		//var buddy = e.getActiveTab().id;
-		/*if(Ext.ComponentMgr.get(buddy)){
+		var buddy = e.getActiveTab().id;
+		if(Ext.ComponentMgr.get(buddy)){
 			var oldIconClass = Ext.ComponentMgr.get(buddy).iconCls;
 			var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddy).ownerCt.getTabEl(Ext.ComponentMgr.get(buddy))).child('span.x-tab-strip-text');
 			tabSpan.removeClass(oldIconClass);
 			Ext.ComponentMgr.get(buddy).iconCls = ExtJame.roster.getBuddy(buddy).attributes.status;
-			tabSpan.addClass(buddy);
-			Ext.ComponentMgr.get(buddy).ownerCt.doLayout();
-		}*/
+			tabSpan.addClass(ExtJame.roster.getBuddy(buddy).attributes.status);
+		}
 	}
 
 	/**
