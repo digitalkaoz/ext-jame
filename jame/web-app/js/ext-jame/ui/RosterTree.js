@@ -233,7 +233,7 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var removeGroupFromTree = function(_name){
 		extTree.root.removeChild(rosterGroups.get(_name));
-		rosterGroups.remove(_name);
+		rosterGroups.unset(_name);
 	}
 	
 	/**
@@ -243,7 +243,7 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var removeBuddyFromTree = function(_jid){
 		rosterBuddys.get(_jid).parentNode.removeChild(rosterBuddys.get(_jid));
-		rosterBuddys.remove(_key);
+		rosterBuddys.unset(_jid);
 	}
 	
 	/**

@@ -164,12 +164,7 @@ ExtJame.factory = {
 					 		msg: 'Backend out of sync',
 					 		buttons: Ext.MessageBox.OK,
 							icon:Ext.MessageBox.ERROR,
-							fn:function(e){
-								Ext.WindowMgr.each(function(win){win.close()});
-								ExtJame.connected = false;
-								ExtJame.mgr.stopAutoRefresh();
-			    				pe.stop();
-							}
+							fn:ExtJame.factory.closeClient
 						});
 					}
 			}, 30);
@@ -197,5 +192,12 @@ ExtJame.factory = {
 	 */
 	 cutJid : function (jid){
 	 	return jid.substring(0,jid.indexOf("@"));
+	 },
+	 closeClient : function(){
+			Ext.WindowMgr.each(function(win){win.close()});
+			Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
+			ExtJame.connected = false;
+			ExtJame.mgr.stopAutoRefresh();
+    		ExtJame.timer.stop();
 	 }
 }
