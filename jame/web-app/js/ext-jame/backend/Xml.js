@@ -164,7 +164,8 @@ ExtJame.backend.Xml = {
 				var panel = Ext.ComponentMgr.get(messages[i]["from"]).getComponent(0);
 				var d = new Date();
 				var ts = d.getHours()+":"+d.getMinutes();
-		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"] </b>"+messages[i]["msg"]+"<br/>";
+				var val = messages[i]["msg"].replace(/script|onclick/g, "");
+		 		var btext = "<b style='color:red;'>["+ExtJame.factory.cutJid(messages[i]["from"])+" "+ts+"] </b>"+val+"<br/>";
 				panel.body.insertHtml("beforeEnd",btext);
 				panel.body.scroll('b',panel.body.dom.offsetHeight,false);
 				if(Ext.ComponentMgr.get(messages[i]["from"]) && Ext.ComponentMgr.get(messages[i]["from"]) != Ext.ComponentMgr.get(messages[i]["from"]).ownerCt.getActiveTab()){

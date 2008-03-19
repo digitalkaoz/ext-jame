@@ -151,7 +151,8 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 		var ts = d.getHours()+":"+d.getMinutes();
 		var output = this.getComponent(0);
 		var editor = this.getComponent(1).findByType("htmleditor")[0];
- 		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+editor.getValue()+"<br/>";
+		var val = editor.getValue().replace(/script|onclick/g, "");
+ 		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+val+"<br/>";
 		output.body.insertHtml("beforeEnd",myText);
 		editor.reset();
 		output.ownerCt.doLayout();
