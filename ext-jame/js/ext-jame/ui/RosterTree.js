@@ -34,20 +34,17 @@ ExtJame.ui.RosterTree = function(_parent){
 				allowDrag:false,
 				expanded:true
 		}));
-		try{
-			var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
-			p.load(null, {	//if load was complete
-				read: function(response) {
-					if(response && response.responseXML){
-						var doc = response.responseXML;
-						addGroupToTree(null,doc.documentElement);	//add groups
-						addBuddyToTree(null,doc.documentElement);	//add buddys
-					}
+		var p = new Ext.data.HttpProxy({url:url});	// fetch the groups/buddys from the backend
+		p.load(null, {	//if load was complete
+			read: function(response) {
+				if(response && response.responseXML){
+					var doc = response.responseXML;
+					addGroupToTree(null,doc.documentElement);	//add groups
+					addBuddyToTree(null,doc.documentElement);	//add buddys
 				}
-			}, function(){parent.add(extTree); parent.doLayout();}, extTree);
-		}catch(e){
-			parent.add(extTree); parent.doLayout();
-		}
+			}
+		}, function(){parent.add(extTree); parent.doLayout();}, extTree);
+		return extTree;
 	}
 	
 	/**
@@ -236,7 +233,7 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var removeGroupFromTree = function(_name){
 		extTree.root.removeChild(rosterGroups.get(_name));
-		rosterGroups.remove(_name);
+		rosterGroups.unset(_name);
 	}
 	
 	/**
@@ -246,7 +243,7 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var removeBuddyFromTree = function(_jid){
 		rosterBuddys.get(_jid).parentNode.removeChild(rosterBuddys.get(_jid));
-		rosterBuddys.remove(_key);
+		rosterBuddys.unset(_jid);
 	}
 	
 	/**
@@ -262,72 +259,48 @@ ExtJame.ui.RosterTree = function(_parent){
 			e = a;	
 		if(e.getAttribute("type") == "success" || e.getAttribute("type") == "push"){
 			if(f){
-				var _buddy = new Ext.tree.TreeNode({ //buddy adden
-						id:f.findField("name").getValue(),
-						status:"subscription pending",
-						status_text:"offline",
-						jid:f.findField("name").getValue(),
-						subscription:"subscribe",
-						hide:false,
-						text:f.findField("name").getValue(),
-						icon:"images/jame/icon_invisible.png",
-						allowDrag:true,
-						allowDrop:false,
-						qtip:"JID : "+f.findField("name").getValue()
-					});
-					_buddy.on("contextmenu",buddyContext,this);
-					_buddy.on("dblclick",initChat,this);
-					if(rosterGroups[f.findField("group").getValue()]){
-						$H(rosterGroups).each(function(g){
-							if(buddy["group"] == g.key){
-								extTree.root.findChild("gname",g.key).appendChild(_buddy);
-								appended = true;
-							}
-						});
-					}
-					if(!appended)
-						extTree.root.appendChild(_buddy);
-					_buddy.on("move",switchUserGroup,this);
-					rosterBuddys.set(f.findField("name").getValue(), _buddy);
+				var buddy = Array();
+				buddy["jid"] = f.findField("name").getValue();
+				buddy["name"] = f.findField("name").getValue();
+				buddy["status"] = "unavailable";
+				buddy["group"] = f.findField("group").getValue();
+				var buddys = Array();
+				buddys[0] = buddy; 
 			}else{
 				var buddys = ExtJame.backend.Xml.getBuddysFromResponse(e.getElementsByTagName("methodResponse")[0]);
-				for(var i=0;i<buddys.length;i++){
-					var buddy = buddys[i];
-					var appended = false;
-					if(buddy["name"])
-						var label = buddy["name"];
-					else{
-						var label = buddy["jid"];
-					}
-					var _buddy = new Ext.tree.TreeNode({ //buddy adden
-							id:buddy["jid"],
-							status:buddy["status"],
-							status_text:buddy["status_text"],
-							jid:buddy["jid"],
-							subscription:buddy["subscription"],
-							hide:false,
-							text:label,
-							icon:"images/jame/icon_"+buddy["status"]+".png",
-							allowDrag:true,
-							allowDrop:false,
-							qtip:"JID : "+buddy["jid"]+"<br/>Status : "+buddy["status"]+"<br/>Text : "+buddy["status_text"]+"<br/>Subscription : "+buddy["subscription"]
-					});
-					_buddy.on("contextmenu",buddyContext,this);
-					_buddy.on("dblclick",initChat,this);
-					if(buddy["group"]){
-						$H(rosterGroups).each(function(g){
-							if(buddy["group"] == g.key){
-								extTree.root.findChild("gname",g.key).appendChild(_buddy);
-								appended = true;
-							}
-						});
-					}
-					if(!appended)
-						extTree.root.appendChild(_buddy);
-					_buddy.on("move",switchUserGroup,this);
-					rosterBuddys.set(buddy["jid"], _buddy);
-				}
 			}
+			for(var i=0;i<buddys.length;i++){
+				var buddy = buddys[i];
+				var appended = false;
+				if(buddy["name"])
+					var label = buddy["name"];
+				else{
+					var label = buddy["jid"];
+				}
+				var _buddy = new Ext.tree.TreeNode({ //buddy adden
+						id:buddy["jid"],
+						status:buddy["status"],
+						status_text:buddy["status_text"],
+						jid:buddy["jid"],
+						subscription:buddy["subscription"],
+						hide:false,
+						text:label,
+						icon:ExtJame.backend.url.baseurl+"images/jame/icon_"+buddy["status"]+".png",
+						allowDrag:true,
+						allowDrop:false,
+						qtip:"JID : "+buddy["jid"]+"<br/>Status : "+buddy["status"]+"<br/>Text : "+buddy["status_text"]+"<br/>Subscription : "+buddy["subscription"]
+				});
+				_buddy.on("contextmenu",buddyContext,this);
+				_buddy.on("dblclick",initChat,this);
+				if(buddy["group"]){
+						rosterGroups.get(buddy["group"]).appendChild(_buddy);
+						appended = true;
+				}
+				if(!appended)
+					extTree.root.appendChild(_buddy);
+				_buddy.on("move",switchUserGroup,this);
+				rosterBuddys.set(buddy["jid"], _buddy);
+			}			
 		}
 	}
 	return {
@@ -338,7 +311,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		 */
 		init : function(){
 			if(!extTree)
-				createTree(ExtJame.backend.url.getbuddys);
+				extTree = createTree(ExtJame.backend.url.getbuddys);
 		},
 	
 		/**

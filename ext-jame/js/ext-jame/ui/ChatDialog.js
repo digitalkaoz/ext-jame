@@ -42,9 +42,12 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 		extDialog.getComponent(0).on("tabchange", tabChange,extDialog.getComponent(0));		
 		extDialog.setTitle(jid);
 		extDialog.on("destroy", removeChats);
-		addPanel(extDialog.getComponent(0),jid);
+		var panel = addPanel(extDialog.getComponent(0),jid);
 		extDialog.show(opener);
-		//panel.getComponent(1).findByType("htmleditor")[0].toggleSourceEdit(true);
+		var editor = panel.getComponent(1).findByType("htmleditor")[0];
+		bindSpecialKeys(editor);
+		editor.onEditorEvent = submit;
+		
 		tabpanel = extDialog.getComponent(0);
 		dd = new Ext.dd.DropTarget(tabpanel.getId(),{
 			ddGroup:"buddys",
@@ -54,6 +57,53 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 		extDialog.doLayout();
 	}
 	
+	/**
+	 * @method submit
+	 * @private
+	 * @description submits a form
+	 */
+	var submit = function(el,B,d){
+	   var keyCode = (document.layers) ? keyStroke.which : el.keyCode;
+	   if((keyCode == 13)){
+	   		this.syncValue();
+	   		this.setValue(this.getRawValue().replace(/<br>/g, ""));
+	   		var form = this.ownerCt.form;
+	   		var panel = this.ownerCt.ownerCt;
+	
+	   }
+		else if(B && !B.nodeName && B.getKey()==13){
+			var form = this.form;
+			var panel = this.ownerCt;
+		}
+		try{
+			if( form && panel && panel.getComponent(1).findByType("htmleditor")[0].getValue().length > 0){
+				form.submit({
+					reset:false,
+					scope: panel,
+					success : pullResponse
+				});
+			}
+		}catch(e){
+			//TODO
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	var bindSpecialKeys = function(editor){
+		var panel = editor.ownerCt.ownerCt;
+		//event for sourcediting
+		editor.listener = new Ext.KeyMap(editor.el.dom, {
+	   			key: 13,
+	   			alt:false,
+	   			fn: submit,
+	   			scope:panel.getComponent(1)
+		});
+		//event for normal mode
+		//editor.focus();
+		//editor.toggleSourceEdit(true);
+	} 
 	/**
 	 * @method closeTab
 	 * @private
@@ -82,6 +132,14 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	 */
 	var tabChange = function(e){
 		extDialog.setTitle(e.getActiveTab().title);
+		var buddy = e.getActiveTab().id;
+		if(Ext.ComponentMgr.get(buddy)){
+			var oldIconClass = Ext.ComponentMgr.get(buddy).iconCls;
+			var tabSpan = Ext.fly(Ext.ComponentMgr.get(buddy).ownerCt.getTabEl(Ext.ComponentMgr.get(buddy))).child('span.x-tab-strip-text');
+			tabSpan.removeClass(oldIconClass);
+			Ext.ComponentMgr.get(buddy).iconCls = ExtJame.roster.getBuddy(buddy).attributes.status;
+			tabSpan.addClass(ExtJame.roster.getBuddy(buddy).attributes.status);
+		}
 	}
 
 	/**
@@ -91,36 +149,13 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	var pullResponse = function(){
 		var d = new Date();
 		var ts = d.getHours()+":"+d.getMinutes();
- 		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+this.ownerCt.form.items.items[0].getValue()+"<br/>";
-		this.ownerCt.ownerCt.getComponent(0).body.insertHtml("beforeEnd",myText);
-		this.ownerCt.form.items.items[0].reset();
-		p = this.ownerCt.ownerCt.getComponent(0); 
-		//p.getEl().scroll("bottom",p.getEl().getY() - p.getEl().dom.scrollTop,true)
-	}
-
-	/**
-	 * @method submit
-	 * @private
-	 * @description submits a form
-	 */
-	var submit = function(el,event,d){
-		try{
-			if(event.ENTER){
-				el.ownerCt.form.submit({
-					reset:false,
-					scope: this,
-					success : pullResponse
-				});
-			}else if(el.text){
-				el.ownerCt.form.submit({
-					reset:false,
-					scope: this,
-					success : pullResponse
-				});
-			}
-		}catch(e){
-			//TODO
-		}
+		var output = this.getComponent(0);
+		var editor = this.getComponent(1).findByType("htmleditor")[0];
+ 		var myText = "<b style='color:blue;'>["+ExtJame.myJid+" "+ts+"]</b> "+editor.getValue()+"<br/>";
+		output.body.insertHtml("beforeEnd",myText);
+		editor.reset();
+		output.ownerCt.doLayout();
+		output.body.scroll('b',output.body.dom.offsetHeight,false);
 	}
 	
 	/**
@@ -158,6 +193,7 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 						minHeight:150,
 						split:true,
 						xtype:'form',
+						waitMsgTarget:true,
 						border:false,
 						hideLabels:true,
 						bodyStyle:'background:transparent;',
@@ -169,8 +205,12 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 				                fieldLabel: '',
 				                name: 'body',
 								allowBlank:false,
+								preventScrollBars:true,
 								anchor:'0-50',
-								border:false
+								border:false,
+								enableLinks:false,
+								enableLists:false,
+								enableAlignments:false
 				            },{
 				                xtype:'hidden',
 				                fieldLabel: '',
@@ -179,10 +219,10 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 								allowBlank:false
 						}
 						],
-						buttons:[{
+						/*buttons:[{
 							text:"Send",
 							handler:submit
-						}]
+						}]*/
 					}]
 			});
 	  }
@@ -201,18 +241,23 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 				chatPanel.setIconClass("unavailable");
 			tabpanel.add(chatPanel);
 			Ext.ComponentMgr.register(chatPanel);
-			tabpanel.activate(chatPanel.id);
+			chatPanel.show();
 			extDialog.doLayout();
+			tabpanel.activate(chatPanel.id);
 			//events
 			chatPanel.on("destroy", closeTab,chatPanel);
-			//chatPanel.getComponent(1).findByType("htmleditor")[0].on("specialkey",submit,item);
-			//chatPanel.getComponent(1).findByType("htmleditor")[0].toggleSourceEdit(true);
+			var editor = chatPanel.getComponent(1).findByType("htmleditor")[0];
+			if(editor.el){
+				bindSpecialKeys(editor);
+				editor.onEditorEvent = submit;
+			}
 			tabpanel.doLayout();
 		}else{
 			var pDlg = Ext.ComponentMgr.get(jid).parent;
 			Ext.WindowMgr.get(pDlg).show();
 			Ext.WindowMgr.get(pDlg).getComponent(0).activate(jid);
 		}
+		return chatPanel;
 	}
 	
 	return {
