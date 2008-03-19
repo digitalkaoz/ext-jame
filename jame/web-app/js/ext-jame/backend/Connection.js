@@ -80,12 +80,8 @@ ExtJame.backend.Connection = {
 			Ext.MessageBox.hide();
 			if(btn == "yes"){
 				var parseDom = function(e){
-					if(e.getAttribute("type") == "success"){	
-						Ext.WindowMgr.each(function(win){win.close()});
-						Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
-						ExtJame.connected = false;
-						ExtJame.mgr.stopAutoRefresh();
-			    		ExtJame.timer.stop();
+					if(e.getAttribute("type") == "success"){
+						ExtJame.factory.closeClient();	
 					}else{
 						// TODO
 						window.location.reload();
