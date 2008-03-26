@@ -5,7 +5,7 @@
 */
 
 /**
- * @class ExtJame.helpers
+ * @class ExtJame.factory
  * @description some helpers functions
  */
 ExtJame.factory = {
@@ -16,13 +16,13 @@ ExtJame.factory = {
 	 * @description stores the status types
 	 */
 	statusStore : new Ext.data.SimpleStore({
-		fields: ["value", "text"],
-		data : [["available","Online"],
-				["away","Away"],
-				["dnd","DND"],
-				["chat","Chat"],
-				["xa","XA"],
-				["unavailable","Unavailable"]
+		fields: ["value", "text","icon"],
+		data : [["available","Online","images/jame/icon_available.png"],
+				["away","Away","images/jame/icon_away.png"],
+				["dnd","DND","images/jame/icon_dnd.png"],
+				["chat","Chat","images/jame/icon_chat.png"],
+				["xa","XA","images/jame/icon_xa.png"],
+				["unavailable","Unavailable","images/jame/icon_unavailable.png"]
 			]
 	}),
 

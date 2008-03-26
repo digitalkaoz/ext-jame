@@ -159,6 +159,8 @@ ExtJame.ui.UiConfig = {
 				store:ExtJame.factory.statusStore, 
 				displayField:'text',
 				valueField:'value',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><img src="{icon}" alt="{text}"/> {text}</div></tpl>',
+				value:'available',
 				typeAhead: true,
 				name:'message',
 				mode: 'local',
