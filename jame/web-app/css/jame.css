@@ -169,3 +169,6 @@ div#update-container {
 .invisible{
 	background-image:url('../images/jame/icon_invisible.png') !important
 }
+.message{
+	background-image:url('../images/jame/message-pending.png') !important
+}

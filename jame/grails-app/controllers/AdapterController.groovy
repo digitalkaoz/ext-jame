@@ -153,6 +153,7 @@ class AdapterController {
 			session.adapter = new Adapter()
 			errors = "You are not connected"
 		}
+    	//render(contentType:"text/plain",text:buddys)
 		XmlOut(session.adapter.response("Adapter.getBuddys",fnResult,["error":errors,"buddys":buddys,"groups":groups]))
 	}
 	
