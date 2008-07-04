@@ -50,10 +50,12 @@ ExtJame.factory = {
 	 * @description shows some infos about the programm in a new dialog
 	 */
 	showAbout : function(e){
-		if(!Ext.WindowMgr.get("AboutDialog"))
-			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AboutLayout).init();
-		else
+		if (!Ext.WindowMgr.get("AboutDialog")) {
+			new ExtJame.ui.SimpleDialog(ExtJame.hud, ExtJame.ui.UiConfig.AboutLayout).init();
+		}
+		else {
 			Ext.WindowMgr.get("AboutDialog").show();
+		}
 	},
 	
 	/**
@@ -76,8 +78,9 @@ ExtJame.factory = {
 		if(!Ext.WindowMgr.get("ClientDialog").getTopToolbar().items.items[0].menu.items.items[3].checked){
 		var groups = ExtJame.roster.getGroups();
 			groups.each(function(g){
-				if(g.value.findChild("hide",false) == null)
+				if (g.value.findChild("hide", false) == null) {
 					g.value.ui.ctNode.parentNode.style.display = 'none';
+				}
 			});
 		}
 	},
@@ -121,10 +124,12 @@ ExtJame.factory = {
 	 * @description creates a SimpleDialog and a SimpleForm for adding groups to the roster
 	 */
 	addGroup : function(e){
-		if(!Ext.WindowMgr.get("AddGroupDialog"))
-			new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.AddGroupLayout).init();
-		else
+		if (!Ext.WindowMgr.get("AddGroupDialog")) {
+			new ExtJame.ui.SimpleDialog(ExtJame.hud, ExtJame.ui.UiConfig.AddGroupLayout).init();
+		}
+		else {
 			Ext.WindowMgr.get("AddGroupDialog").show();
+		}
 	},
 	
 	/**
@@ -151,10 +156,12 @@ ExtJame.factory = {
 	loginORclient :function(e){
 		if(e != null && e.getAttribute("type") == "success" && ExtJame.backend.Xml.getUserFromResponse(e)){	//yes is still connected
 			ExtJame.connected = true;
-			if(!Ext.WindowMgr.get("ClientDialog"))
-				new ExtJame.ui.ClientDialog(ExtJame.hud,ExtJame.ui.UiConfig.ClientLayout).init();
-			else
+			if (!Ext.WindowMgr.get("ClientDialog")) {
+				new ExtJame.ui.ClientDialog(ExtJame.hud, ExtJame.ui.UiConfig.ClientLayout).init();
+			}
+			else {
 				Ext.WindowMgr.get("ClientDialog").show();
+			}
 			ExtJame.connected = true;
 			$('jame-hud').setAttribute("lastActivity",new Date().getTime());
 			ExtJame.timer = new PeriodicalExecuter(function(pe) {
@@ -168,22 +175,19 @@ ExtJame.factory = {
 						});
 					}
 			}, 30);
-			if(Ext.WindowMgr.get("LoginDialog"))
+			if (Ext.WindowMgr.get("LoginDialog")) {
 				Ext.WindowMgr.get("LoginDialog").close();
+			}
 			ExtJame.backend.Connection.getNotifications();
 		}else{	// no is not connected,show the login widget
-				/*Ext.Msg.show({
-			 		title:'Error Occured',
-			 		msg: 'Could not Connect',
-			 		buttons: Ext.MessageBox.OK,
-					icon:Ext.MessageBox.ERROR
-				});*/
 			ExtJame.connected = false;
-			if(!Ext.WindowMgr.get("LoginDialog"))
-				new ExtJame.ui.SimpleDialog(ExtJame.hud,ExtJame.ui.UiConfig.LoginLayout).init();
-			else
+			if (!Ext.WindowMgr.get("LoginDialog")) {
+				new ExtJame.ui.SimpleDialog(ExtJame.hud, ExtJame.ui.UiConfig.LoginLayout).init();
+			}
+			else {
 				Ext.WindowMgr.get("LoginDialog").show();
 				Ext.WindowMgr.get("LoginDialog").getComponent(0).getForm.reset();
+			}
 		}
 	},
 	
@@ -195,7 +199,7 @@ ExtJame.factory = {
 	 },
 	 closeClient : function(){
 			Ext.WindowMgr.each(function(win){win.close()});
-			Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
+			Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp);});
 			ExtJame.connected = false;
 			ExtJame.mgr.stopAutoRefresh();
     		ExtJame.timer.stop();

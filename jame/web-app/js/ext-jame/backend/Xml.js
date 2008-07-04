@@ -110,10 +110,12 @@ ExtJame.backend.Xml = {
 			for(var b=0;b<msg.length;b++){
 				if(msg[b].nodeType == 1 && msg[b].nodeName == "message"){
 					var tmp = new Array();
-					if(msg[b].getAttribute("from").indexOf("/"))
-						tmp['from'] = msg[b].getAttribute("from").substr(0,msg[b].getAttribute("from").indexOf("/"));
-					else
+					if (msg[b].getAttribute("from").indexOf("/")) {
+						tmp['from'] = msg[b].getAttribute("from").substr(0, msg[b].getAttribute("from").indexOf("/"));
+					}
+					else {
 						tmp['from'] = msg[b].getAttribute("from");
+					}
 					tmp['msg'] = msg[b].getElementsByTagName("body")[0].firstChild.nodeValue;
 					ret.push(tmp);
 				}
@@ -143,7 +145,7 @@ ExtJame.backend.Xml = {
 			}
 		}else if(XmlEl.nodeName == "response" && XmlEl.getAttribute("type") == "error"){ //disconnected or something like that
 				Ext.WindowMgr.each(function(win){win.close()});
-				Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp)})
+				Ext.ComponentMgr.all.each(function(comp){Ext.ComponentMgr.unregister(comp);});
 				ExtJame.connected = false;
 				ExtJame.mgr.stopAutoRefresh();
 	    		ExtJame.timer.stop();
@@ -191,10 +193,12 @@ ExtJame.backend.Xml = {
 								var node = ExtJame.roster.getBuddy(buddy["jid"]);
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribe");
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"subscribed");
-								if(node)
-										ExtJame.roster.updateBuddy(node,buddy);
-								else
-										ExtJame.roster.addBuddys(null,xml);
+								if (node) {
+									ExtJame.roster.updateBuddy(node, buddy);
+								}
+								else {
+									ExtJame.roster.addBuddys(null, xml);
+								}
 							}else{
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"unsubscribe");
 								ExtJame.backend.Connection.sendSubscription(buddy["jid"],"unsubscribed");

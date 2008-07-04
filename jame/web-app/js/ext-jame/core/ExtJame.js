@@ -28,16 +28,18 @@ var ExtJame = {
 		//turn on quicktips
 		Ext.QuickTips.init();
     	
-		if(!ExtJame.connected)
+		if (!ExtJame.connected) {
 			ExtJame.backend.Connection.isConnected();
-		else{
-			if(Ext.WindowMgr.getActive())
+		}
+		else {
+			if (Ext.WindowMgr.getActive()) {
 				Ext.WindowMgr.hideAll();
-			else{
+			}
+			else {
 				Ext.WindowMgr.each(function(win){
-					if(!win.initialConfig.modal)
+					if (!win.initialConfig.modal) 
 						win.show();
-				})
+				});
 			}
 		}
 	}
@@ -49,10 +51,10 @@ var ExtJame = {
 Ext.onReady(function(){
 	$("jame-container").innerHTML= '<input type="button" id="jame-hud" value="start Client" />';
     ExtJame.hud = Ext.get('jame-hud');
-    if(ExtJame.hud)
-    	ExtJame.hud.on('click', ExtJame.init);
+    if (ExtJame.hud) {
+		ExtJame.hud.on('click', ExtJame.init);
+	}
 });
-
 
 Ext.override(Ext.form.HtmlEditor, {
     pushValue : function(){

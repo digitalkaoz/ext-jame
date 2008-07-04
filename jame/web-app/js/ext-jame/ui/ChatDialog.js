@@ -69,7 +69,6 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	   		this.setValue(this.getRawValue().replace(/<br>/g, ""));
 	   		var form = this.ownerCt.form;
 	   		var panel = this.ownerCt.ownerCt;
-	
 	   }
 		else if(B && !B.nodeName && B.getKey()==13){
 			var form = this.form;
@@ -122,7 +121,7 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	 * @description removes all chats, if window is closed
 	 */
 	var removeChats = function(){
-		extDialog.getComponent(0).items.each(function(item,index,length){Ext.ComponentMgr.unregister(item);return true;})
+		extDialog.getComponent(0).items.each(function(item,index,length){Ext.ComponentMgr.unregister(item);return true;});
 	}
 	
 	/**
@@ -218,12 +217,7 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 				                name: 'to',
 				                value:jid,
 								allowBlank:false
-						}
-						],
-						/*buttons:[{
-							text:"Send",
-							handler:submit
-						}]*/
+						}]
 					}]
 			});
 	  }
@@ -236,10 +230,12 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 	var addPanel = function(tabpanel,jid){
 		if(!Ext.ComponentMgr.get(jid)){
 			var chatPanel = createPanel(jid);
-			if(ExtJame.roster && ExtJame.roster.getBuddy(jid))
+			if (ExtJame.roster && ExtJame.roster.getBuddy(jid)) {
 				chatPanel.setIconClass(ExtJame.roster.getBuddy(jid).attributes.status);
-			else
+			}
+			else {
 				chatPanel.setIconClass("unavailable");
+			}
 			tabpanel.add(chatPanel);
 			Ext.ComponentMgr.register(chatPanel);
 			chatPanel.show();
@@ -268,10 +264,12 @@ ExtJame.ui.ChatDialog = function(_opener, _config, _jid){
 		 * @description initializes the dialog
 		 */
 		init : function(){
-			if(!extDialog)
+			if (!extDialog) {
 				createDialog();
-			else
+			}
+			else {
 				extDialog.show();
+			}
 		}
 	}
 }

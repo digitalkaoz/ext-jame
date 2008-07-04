@@ -209,7 +209,7 @@ ExtJame.ui.UiConfig = {
 		layout:'fit',
 		items:[{
 			xtype:'panel',
-			html:'<center><h2>ext-jame</h2><p>a javascript jabber messenger</p><p>&copy; 2008 by Robert Schoenthal</p><p>caziel@digitalkaoz.net</p><p>licence: GPL</p></center>',
+			html:'<center><h2>ext-jame</h2><p>a javascript jabber messenger</p><p>&copy; 2008 by Robert Schoenthal</p><p>caziel@digitalkaoz.net</p><p>licence: GPL / Commercial (mail me)</p></center>',
 			bodyStyle:'background:transparent;',
 			bodyBorder:false,
 			border:false

@@ -26,8 +26,7 @@ ExtJame.ui.RosterTree = function(_parent){
 				rootVisible:false,
 				lines:false,
 				ddGroup: "buddys",
-				border:false
-				
+				border:false	
 		});
 		extTree.setRootNode(new Ext.tree.TreeNode({
 				text: "buddys",
@@ -102,28 +101,37 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var buddyContext = function(_node, e){
 		var items = Array();
-		items.push({ 	text: 'message', 
-				handler: initChat ,
-				node:_node,
-				focus:this,
-				icon: 'images/jame/message-pending.png'});
-		items.push({ 	text: 'edit', 
-				handler: renameBuddy ,
-				node:_node, 
-				icon:"images/jame/user_edit.png"});
-		items.push({ 	text: 'delete', 
-				handler: ExtJame.backend.Connection.removeBuddy ,
-				node:_node, 
-				icon:"images/jame/user_delete.png"});
-		if(_node.attributes.subscription == "none" || _node.attributes.subscription == "to" || _node.attributes.subscription == "from")
-			items.push({ 	text: 'subscribe', 
-					handler: subscribedBuddy ,
-					node:_node, 
-					icon:"images/jame/group_go.png"});
+		items.push({ 	
+			text: 'message', 
+			handler: initChat ,
+			node:_node,
+			focus:this,
+			icon: 'images/jame/message-pending.png'
+		});
+		items.push({ 	
+			text: 'edit', 
+			handler: renameBuddy ,
+			node:_node, 
+			icon:"images/jame/user_edit.png"
+		});
+		items.push({ 	
+			text: 'delete', 
+			handler: ExtJame.backend.Connection.removeBuddy ,
+			node:_node, 
+			icon:"images/jame/user_delete.png"
+		});
+		if (_node.attributes.subscription == "none" || _node.attributes.subscription == "to" || _node.attributes.subscription == "from") {
+			items.push({
+				text: 'subscribe',
+				handler: subscribedBuddy,
+				node: _node,
+				icon: "images/jame/group_go.png"
+			});
+		}
 		var menu = new Ext.menu.Menu({ 
 				id: 'menuContext',
 				items: items
-			}); 
+		}); 
 		menu.show(_node.ui.getAnchor());
 	}
 	
@@ -162,8 +170,9 @@ ExtJame.ui.RosterTree = function(_parent){
 			var jid = e.id;
 			var anchor = e.ui.anchor;
 		}
-		if(!anchor)
+		if (!anchor) {
 			anchor = ExtJame.hud;
+		}
 		if(Ext.ComponentMgr.get(jid)){
 			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).show();
 			Ext.WindowMgr.get(Ext.ComponentMgr.get(jid).parent).getComponent(0).activate(jid);
@@ -179,10 +188,12 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var addGroupToTree = function(f,a){
 		var e = null;
-		if(a && a.response)
+		if (a && a.response) {
 			e = a.response.responseXML.firstChild;
-		else
-			e = a;	
+		}
+		else {
+			e = a;
+		}
 		if(e.getAttribute("type") == "success"){
 			if(f){
 				var _group = new Ext.tree.TreeNode({ //group adden
@@ -253,10 +264,12 @@ ExtJame.ui.RosterTree = function(_parent){
 	 */
 	var addBuddyToTree = function(f,a){
 		var e = null;
-		if(a && a.response)
+		if (a && a.response) {
 			e = a.response.responseXML.firstChild;
-		else
-			e = a;	
+		}
+		else {
+			e = a;
+		}
 		if(e.getAttribute("type") == "success" || e.getAttribute("type") == "push"){
 			if(f){
 				var buddy = Array();
@@ -272,9 +285,10 @@ ExtJame.ui.RosterTree = function(_parent){
 			for(var i=0;i<buddys.length;i++){
 				var buddy = buddys[i];
 				var appended = false;
-				if(buddy["name"])
+				if (buddy["name"]) {
 					var label = buddy["name"];
-				else{
+				}
+				else {
 					var label = buddy["jid"];
 				}
 				var _buddy = new Ext.tree.TreeNode({ //buddy adden
@@ -296,8 +310,9 @@ ExtJame.ui.RosterTree = function(_parent){
 						rosterGroups.get(buddy["group"]).appendChild(_buddy);
 						appended = true;
 				}
-				if(!appended)
+				if (!appended) {
 					extTree.root.appendChild(_buddy);
+				}
 				_buddy.on("move",switchUserGroup,this);
 				rosterBuddys.set(buddy["jid"], _buddy);
 			}			
@@ -310,8 +325,9 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description initializes the rostertree
 		 */
 		init : function(){
-			if(!extTree)
+			if (!extTree) {
 				extTree = createTree(ExtJame.backend.url.getbuddys);
+			}
 		},
 	
 		/**
@@ -357,8 +373,9 @@ ExtJame.ui.RosterTree = function(_parent){
 		 */
 		addGroups : function(f,a){
 			addGroupToTree(f,a);
-			if(Ext.WindowMgr.get("AddGroupDialog"))
+			if (Ext.WindowMgr.get("AddGroupDialog")) {
 				Ext.WindowMgr.get("AddGroupDialog").close();
+			}
 		},
 	
 		/**
@@ -368,8 +385,9 @@ ExtJame.ui.RosterTree = function(_parent){
 		 */
 		addBuddys : function(f,a){
 			addBuddyToTree(f,a);
-			if(Ext.WindowMgr.get("AddBuddyDialog"))
+			if (Ext.WindowMgr.get("AddBuddyDialog")) {
 				Ext.WindowMgr.get("AddBuddyDialog").close();
+			}
 		},
 	
 		/**
@@ -412,7 +430,7 @@ ExtJame.ui.RosterTree = function(_parent){
 		 * @description updates a buddy node
 		 */
 		updateBuddy : function(buddy,_attrs){
-			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png",
+			buddy.getUI().iconNode.src = ExtJame.backend.url.baseurl+"images/jame/icon_"+_attrs["status"]+".png";
 			buddy.attributes.status = _attrs['status'];
 			buddy.attributes.subscription = _attrs['subscription'];
 			var qtip = "JID : "+_attrs["jid"]+"<br/>Status : "+_attrs["status"]+"<br/>Text : "+_attrs["status_text"]+"<br/>Subscription : "+_attrs["subscription"];
