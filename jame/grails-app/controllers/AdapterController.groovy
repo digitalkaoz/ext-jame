@@ -59,7 +59,11 @@ class AdapterController {
 				errors = e.getMessage()
 			}
 			session.adapter.name = params.name
-			session.adapter.port = params.port.toInteger()
+			try{
+				session.adapter.port = params.port
+			}catch(Exception e){
+				session.adapter.port = 5222
+			}
 			session.adapter.server = params.server
 		}else{	//session exists, check if still connected
 			if(session.adapter.smack.isConnected()){	// yes is still connected
